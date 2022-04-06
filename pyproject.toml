@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "repl_python3_Primallux"
+version = "0.1.0"
+description = "Primallux is a game, still in development. Text-based, and made so there's a nostalgic feel, just like in older games. In version Alpha. There's barely anything. The basic methods are there though."
+authors = ["fallenhuman <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+ansi = "^0.3.6"
+replit = "^3.2.4"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
