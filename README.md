@@ -28,6 +28,21 @@ __If you find a bug, feel free to contact me in the comments section!__
 (Not right now) Save - Save your data to the database! (I might change this to work with hashed passwords in a file, so...)
 `
 
+------------------------
+__In-fight Controls__ 
+
+**A, F, Attack, Fight** - Perform a melee attack, and deal damage in your damage range, provided you land the hit.
+
+**D, Defend** - Perform a defensive move, with a chance of mitigating all damage from the next attack, or half of it, or none at all.
+
+**C, Consumable** - Use a consumable from your inventory.
+
+**R, Run, Flee** - Attempt to escape from your enemy.
+
+**P, Pacify** - Attempt to convince your enemy not to keep fighting you.
+
+**T, Talk** - Talk to the enemy...provided they have a response.
+
 -------------------------
 | More information: |
 -------------------------

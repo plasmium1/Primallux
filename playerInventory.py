@@ -72,7 +72,7 @@ class ConsumableItem(InvItem):
       else:
         appendedString += appendedString + color + key + " " + str(value)
     return self.typeColor + self.itemName + cyan + ": " + str(self.amount) + appendedString
-  def __str(self):
+  def __str__(self):
     appendedString = " "
     counter = len(self.bonuses.items())
     for key, value in self.bonuses.items():

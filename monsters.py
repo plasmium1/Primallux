@@ -19,10 +19,11 @@ italic = "\u001b[3m"
 
 
 class mob:
-  def __init__(self, name, hp, damage_lower, damage_upper, speed, defense, giveXP, enterBattleText, duringBattleText, exitBattleText, pacifyText, ifPacifyBonus, convinceThreshold=5, lootTable={"Rolls":1}, spells=(), faction="", factionRepDecrease=0, dialogue=()):
+  def __init__(self, name, hp, damage_lower, damage_upper, speed, defense, giveXP, enterBattleText, duringBattleText, exitBattleText, taunt, pacifyText, ifPacifyBonus, convinceThreshold=5, lootTable={"Rolls":1}, spells=(), faction="", factionRepDecrease=0, dialogue=()):
     self.name = name
     self.faction = faction
     self.mobHP = hp
+    self.mobMaxHP = hp
     self.damageLower = damage_lower
     self.damageUpper = damage_upper
     self.speed = speed
@@ -35,16 +36,22 @@ class mob:
     self.enterBattleText = enterBattleText
     self.duringBattleText = duringBattleText
     self.exitBattleText = exitBattleText
+    self.taunt = taunt
     self.pacifyText = pacifyText
     self.ifPacifyBonus = ifPacifyBonus
     self.dialogue = dialogue
-
+  def __str__(self):
+    return self.name + " " + red + "HP: " + str(self.mobHP) + "/" + str(self.mobMaxHP)
+  
   def takeDamage(self, amount):
     self.mobHP -= (amount - self.defense)
 
   def dealDamage(self):
     return randint(self.damageLower, self.damageUpper)
 
+  def resetHP(self):
+    self.mobHP = self.mobMaxHP
+  
   def lootGenerate(self):
     keys = []
     values = []
@@ -69,16 +76,28 @@ class mob:
     return self.duringBattleText
   def getExitText(self):
     return self.exitBattleText
+  def getTaunt(self):
+    return self.taunt
   def pacifyText(self):
     return self.pacifyText
   def getPacifyBonus(self):
     return self.ifPacifyBonus
+  def getFaction(self):
+    return self.faction
   def getDialogue(self):
-    return self.dialogue[randint(0, len(self.dialogue))]
+    if len(self.dialogue) >= 1:
+      return self.dialogue[randint(0, len(self.dialogue))]
+    else:
+      return ""
+  def isDefeated(self):
+    if self.mobHP <= 0:
+      return True
+    else:
+      return False
     
-  def disarm(self, playerRep):
+  def disarm(self, playerStats, playerRep):
     if self.faction == "":
-      if randint(1, self.convinceThreshold) == 0:
+      if choices(("succeed", "fail"), weights=(playerStats["Charisma"], self.convinceThreshold)) == "succeed":
         return True
       else:
         return False
@@ -88,7 +107,7 @@ class mob:
       elif playerRep[self.faction]>100:
         return True
       else:
-        if randint(1, self.convinceThreshold) == 0:
+        if choices(("succeed", "fail"), weights=(playerStats["Charisma"], self.convinceThreshold)) == "succeed":
           return True
         else:
           return False
