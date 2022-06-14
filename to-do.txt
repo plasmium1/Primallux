@@ -1,0 +1,44 @@
+Finish magic system
+
+Add more tiles
+
+Add the Moonreach Guild so gold and quests can be gained (Working on this, too)
+
+Actually implement the timer function (Done for status effects, untested for resource regen, night/day cycles and other time-varying conditionals also not implemented, random event cycles also not implemented)
+
+Implement magic casting (Done for mobs, not done for players)
+
+Fix the bug of status effects having their levels reset when loading back in. (FINISHED)
+
+Make resource tiles work, and test it out - (FINISHED)
+
+Work out nighttime at specific turn intervals. I'm thinking of making it every 250? 500? turns.
+
+Dialogue system <- Finished!
+ - This uses various different characters in its key string to specify conditions that need to be met for a specific response.
+ -- The [letter]) character, literally a closing parenthesis, specifies what character needs to be inputted to choose that response.
+ -- The | character is a split character, and should be checked fairly late in the chain. It's to check the conditionals like Turns and Quests. This HAS to be included in every single dialogue.
+ -- The & character marks what round of talking it is. Best to put this after the Conditional if there is one.
+ -- The ^ character marks what sort of follow-up message group comes after selecting a specific preceding response. Ex: {"a)Greet the person":"Hello!", "d)Ask them how they're doing^a":"I'm doing well, thanks!"} -> (Select a):"Hello!" (print d)Ask them how they're doing):"I'm doing well, thanks!"
+ --- NOTE: ALWAYS PUT THIS AT THE END. 
+
+Merchant system:
+ - Buy items (FINISHED)
+ - Haggle (Might need a nerf for this) (FINISHED)
+ - Reputation buffs and debuffs enhance the prices accordingly. (Uh)
+
+Haggling system (FINISHED!):
+ - Player begins to buy/sell an item. Given a prompt to increase price, or decrease price of the item.
+ - Each time the value increases when the player's buying, the merchant is more likely to accept, while if it's >= than the original value, the merchant accepts immediately, provided the player has the money. Opposite applies when value is decreased when buying.
+ - Much like buying, selling works like above, but reversed. Selling doesn't work for some reason, it just ends up skipping the whole program.
+ - Player can freely set the new price, just that price cannot go below 0.
+
+Crafting: (FINISHED, HELL YEAH) (well, the system works, but most of these aren't implemented)
+ - Smithing (Forge) < Mining 
+ - Alchemy (Cauldron) < Herbalism
+ - Tinkering (Workbench) < Salvaging
+ - Jeweling (Toolkit) < Mining
+ - Runation (Inscription Pen) < Mining/Salvaging
+ - Cooking (Pot) < Fishing/Hunting
+
+putting (FINISHED) at the end of things is hella satisfying lol
