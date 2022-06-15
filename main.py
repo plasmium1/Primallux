@@ -232,7 +232,7 @@ def selector():  #Character selector for specific character attribute bonus thin
 	global race
 	global gender
 	global name
-	stats["Perception"] += 900
+  
 	print(cyan + "Pick your character race:")
 	print(" Human" + gold + " (Charisma/Dexterity)")
 	print(cyan + " Elf" + gold + " (Intelligence/Wisdom)")
@@ -1055,7 +1055,6 @@ def tileManager(number, flag=False):  #Function for running to streamline tile c
   global turns, tile, statusEffects
   tile = number
   turns += 1
-  print(tileRespawn, "\n", turns)
   
   signalFlag = False
   variable = tilesDict[number]
@@ -1133,7 +1132,7 @@ def tileManager(number, flag=False):  #Function for running to streamline tile c
   if userInput == "search" or userInput == "look" or userInput == "l":  #When the player searches, they run a huge function to test if they find loot or not, and/or find a monster. Also leaves some nice text.
     if type(variable.getEncounter()) != bool and variable.getEncounter().getFaction() != "":
       replit.clear()
-      try:
+      if variable.getReferenceName() in mobList.keys():
         if variable.encounterTest(mobList[variable.getReferenceName()], reputation[variable.getEncounter().getFaction()]):
           monsterFight(variable.getEncounter())
           mobList[variable.getReferenceName()] -= 1
@@ -1141,22 +1140,21 @@ def tileManager(number, flag=False):  #Function for running to streamline tile c
           print(variable.getNoMoreMobsText())
         else:
           print(reset + variable.getNoFindText())
-      except KeyError:
+      else:
         print(blue + "You don't find anything that presents a suitable challenge.", reset)  #When there's no mob in the tile.
     elif type(variable.getEncounter()) != bool:
       try:
         if variable.encounterTest(mobList[variable.getReferenceName()]):
           monsterFight(variable.getEncounter())
           mobList[variable.getReferenceName()] -= 1
-          
-          
         elif mobList[variable.getReferenceName()] == 0:
           print(variable.getNoMoreMobsText())
         else:
           print(reset + variable.getNoFindText())
       except KeyError:
         print(blue + "You don't find anything that presents a suitable challenge.", reset)  #When there's no mob in the tile.
-    if (mobList[variable.getReferenceName()] == 0) and (variable.getReferenceName() not in tileRespawn.keys()):
+    
+    if (variable.getReferenceName() in mobList.keys()) and (mobList[variable.getReferenceName()] == 0) and (variable.getReferenceName() not in tileRespawn.keys()):
             tileRespawn.update({variable.getReferenceName():turns + defaultTileRespawns[variable.getReferenceName()]})
     print(variable.getSearchText())
     if variable.getReferenceName() in tileItems and tileItems[variable.getReferenceName()] == 0:
