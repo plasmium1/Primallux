@@ -3,7 +3,7 @@ from ansi.colour.fx import reset
 from random import choices, choice
 import monsters
 from playerInventory import identifierDict
-from monsters import hungryWolf, koboldScout, caveShrieker, caveCrawler
+from monsters import hungryWolf, forestWolf, koboldScout, caveShrieker, caveCrawler, Mob
 #Use this later for handling the tile if statements?
 black = "\u001b[30m"
 red = "\u001b[31m"
@@ -129,8 +129,9 @@ class Dialogue:
             self.setMetBefore(True)
             return value
       return ""
+
   def getOneFurtherDialogue(self, key):
-      return self.dialogueRounds[key]
+      return "".join(list(filter(lambda a: a not in ("@", "*", "#", "`"), self.dialogueRounds[key])))
   def getFurtherDialogueDict(self):
       return self.dialogueRounds
 class Interactible:
@@ -169,10 +170,6 @@ class Interactible:
     return self.gatherMod
   def getRecipes(self):
     return self.recipes
-  def getSelling(self):
-    return self.selling
-  def getBuying(self):
-    return self.buying
   def getCraftingType(self):
     return self.craftingType
   def getLoot(self, stat):
@@ -200,25 +197,30 @@ class Interactible:
   def getMerchants(self):
     return self.merchants
 
-dialogue1 = Dialogue(greeting={"Starter":"\"Hail the Moons!\"", "Turns < 200":"\"You new here?\"", "Turns > 200":"\"I'm glad to see you again!\"", "Turns > 700":"\"Ah, it's you again. How long has it been, this time?\""}, goodbye={"Starter":"\"I wish you luck on your journey!\""}, metBefore=False, dialogueRounds={"f)Ask about the fortress.|Turns < 200&Round 1":"\"The Moonreach Fortress is pretty much the center of the Hertolfan forest, the hub of trade in this region.\nThe guild pays no little amount of gold to its adventurers who go out and protect citizens like me.\nAnd, I get to be paid when they buy my goods!\"", "b)Ask the traveler why he didn't join the Guild.|&Round 2^f@":"\"Well, uh, I'm not that brave of a guy, haha.\"", "g)Goodbye.|&Round 1":""})
+dialogue1 = Dialogue(greeting={"Starter":"\"Hail the Moons!\"", "Turns < 200":"\"You new here?\"", "Turns > 200":"\"I'm glad to see you again!\"", "Turns > 700":"\"Ah, it's you again. How long has it been, this time?\""}, goodbye={"Starter":"\"I wish you luck on your journey!\""}, metBefore=False, dialogueRounds={"f)Ask about the fortress.|Turns < 200&Round 1":"\"The Moonreach Fortress is pretty much the center of the Hertolfan forest, the hub of trade in this region.\nThe guild pays no little amount of gold to its adventurers who go out and protect citizens like me.\nAnd, I get to be paid when they buy my goods!\"", "b)Ask the traveler why he didn't join the Guild.|&Round 2^f@":"\"Well, uh, I'm not that brave of a guy, haha.\"", "g)Goodbye.|&Round 1":"", "g)Goodbye.|&Round 2":""})
 
-dialogue2 = Dialogue(greeting={"Starter":"\"Anything you'd like to eat?\"", "Turns > 50":"\"Good, yeah?\""}, goodbye={"Starter":"\"Thank you for your business!\""})
+dialogue2 = Dialogue(greeting={"Starter":"\"Anything you like?\"", "Turns > 50":"\"How you doing?\""}, goodbye={"Starter":"\"Thank you for your business!\"", "Turns > 50":"\"See you 'round!'\""}, metBefore=False, dialogueRounds={"i)Say that the food smells great.@|&Round 1":"\"Glad ya like it! Why don't you have a taste?\"", "c)Ask for his recipe.#@|Turns > 100&Round 1":"\"Haha, I'd be throwin' away my business if I told you!\"", "g)Goodbye.|&Round 1":""})
 
-merchant1 = Merchant("Peddler Jonas", "The Roasting Spit", "As you approach the stand, you smell an intensely enticing aroma, as the smell of cooked meat lathered in sauce caresses your nostrils.", "Moonreach Guild", {"Roast Rabbit":4}, discounts=1, dialogue=dialogue2)
+# dialogue3 = Dialogue(greeting={"Starter":""})
 
-merchant2 = Merchant("Armorsmith Barro", "The Hammer and Plate", "A sign with a black-headed hammer over a silver-colored chestplate hangs over a medium-sized shop, where banging sounds from within.", "Moonreach Guild", {"Plated Leather Jerkin":16})
+merchant1 = Merchant("Peddler Jonas", "The Roasting Spit", "As you approach the stand, you smell an intensely enticing aroma, as the smell of cooked meat lathered in sauce caresses your nostrils.", "Moonreach Guild", {"Roast Bean Skewer":4, "Roast Mushroom Skewer":5}, discounts=1, dialogue=dialogue2)
+
+merchant2 = Merchant("Armorsmith Barro", "The Hammer and Plate", "A sign with a black-headed hammer over a silver-colored chestplate hangs over a medium-sized shop, where banging sounds from within.", "Moonreach Guild", {"Plated Leather Jerkin":24})
 
 interact1 = Interactible("Dungeon Entrance", "You enter the cave, walking into the yawning, dirty, stone.", toTileID=-1)
 interact2 = Interactible("Dungeon Entrance", "You exit the cave, as your eyes slowly adjust to the light of the outside.", toTileID=9)
-interact3 = Interactible("Dialogue", "You approach one of the other travelers entering the gates.", dialogue=dialogue1)
+interact3 = Interactible("Dialogue", "You approach another traveler entering the gates.", dialogue=dialogue1)
 interact4 = Interactible("Merchant", "You approach the stalls.", merchants=(merchant1, merchant2))
+interact4 = Interactible("Dialogue", "The demon raises his horned head, a chiseled face with a pair of darkened eyes looking at you in question, wordlessly asking for you to quickly go on and tell him what it was that troubled you so to enter the room.", )
 crafting1 = Interactible("Crafting", "You enter the house radiating of strange fumes, as you smell odd smells that fill the air of this house of hissing and puffing magical machinery.", craftingType="Alchemy")
-resource1 = Interactible("Resource", "You attempt to capture one of the fish swimming in these waters.", tileID=7, lootTable={"Rolls":1, "Fresh Perch":4, "Nothing":96}, gatherMod="Fishing")
-interactionDict = {9:interact1, -1:interact2, 7:resource1, 10:interact3, 12:interact4, 16:crafting1}
+resource1 = Interactible("Resource", "You attempt to capture one of the fish swimming in these waters.", tileID=7, lootTable={"Rolls":1, "Fresh Perch|Fishing|3":4, "Nothing":96}, gatherMod="Fishing")
+
+moonreachQuestHall = Interactible("Quest Hall", "The Moonreach Quest Hall displays a wall of parchment papers that write a multitude of tasks open for you.")
+
 
 class Tile:
   #Input nearbyTiles as a dictionary! Put in indices as "North," "South," "East," or "West." Use a string to use as text for a tile that isn't there.
-  def __init__(self, flavorText, searchText, thisTileID, nearbyTiles, tileNotFoundText=(gold + "Area not made yet, sorry."), interactible=False, climbable=False, upTileID=0, downTileID=0, climbText="", climbFailText="", climbFailDamage=0, climbRequirement=0, encounter=False, encounterChance=0, findNoEncounterText="", repNoEncounterText="", noMoreMobsText="", entryEncounter=False, lootTable={}, statModifiers={}, questFlavorText={}, questSearchText={}):
+  def __init__(self, flavorText, searchText, thisTileID, nearbyTiles, tileNotFoundText=(gold + "Area not made yet, sorry."), interactible=False, climbable=False, upTileID=0, downTileID=0, climbText="", climbFailText="", climbFailDamage=0, climbRequirement=0, encounter=False, encounterChance=0, findNoEncounterText="", repNoEncounterText="", noMoreMobsText="", entryEncounter=False, lootTable={}, statModifiers={}, questFlavorText={}, questSearchText={}, questEncounters={}, questEntryEncounter=False):
     self.thisTileID = thisTileID
     self.flavorText = flavorText
     self.nearbyTiles = nearbyTiles
@@ -244,6 +246,10 @@ class Tile:
       self.originalNothing = lootTable["Nothing"]
     except KeyError:
       self.originalNothing = 0
+    self.questFlavorText = questFlavorText
+    self.questSearchText = questSearchText
+    self.questEncounters = questEncounters
+    self.questEntryEncounter = questEntryEncounter
 
 
   def resetNothing(self):
@@ -307,9 +313,30 @@ class Tile:
     return self.climbText
   def getClimbFailText(self):
     return self.climbFailText
+  def getQuestEntryEncounter(self):
+    return self.questEntryEncounter
+  def getQuestFlavorText(self, questProgress):
+    st = ""
+    for key, value in self.questFlavorText.items():
+      ph = key.split("|")
+      if questProgress[ph[0]] == int(ph[1]):
+        st += self.questFlavorText[key]
+      st += "\n"
+    st = st.strip()
+    return st
+  def getQuestSearchText(self, questProgress):
+    st = ""
+    for key, value in self.questSearchText.items():
+      ph = key.split("|")
+      if questProgress[ph[0]] == int(ph[1]):
+        st += self.questSearchText[key]
+      st += "\n"
+    st = st.strip()
+    return st
 
   def randomSetInteractible(self, weight):
     self.interactible = choices((True, False), (weight, 100-weight), k=1)[0]
+    print(self.interactible)
 
   def resetInteractible(self):
     self.interactible = "Random"
@@ -332,7 +359,7 @@ class Tile:
           return False
       else:
         return False
-
+  
   def encounterOnEnter(self, mobAmount):
     if choices(("meet", "no meet"), (mobAmount, 100-mobAmount)) == ["meet"]:
       return True
@@ -344,31 +371,57 @@ class Tile:
     self.resetNothings()
     #Modifier set and finished.
     
-  def checkClimb(self, modifierStat):
+  def checkClimb(self, modifierStat:int) -> bool:
     if choices(("success", "fail"), (modifierStat, self.climbRequirement)) == ["success"]:
       print(blue + self.climbText, reset)
       return True
     else:
       print(red + self.climbFailText, reset)
       return False
+        
+  def checkQuestEncounters(self, key:str, value:int) -> bool:
+      for k, v in self.questEncounters.items():
+          k = k.split("|")
+          if k[0] == key and int(k[1]) == value and v[1] > 0:
+              return True
+      return False
+    
+  def isQuestEncounter(self, questProgress:dict) -> bool:
+      success = [key for key, value in questProgress.items() if self.checkQuestEncounters(key, int(value))]
+      if len(success) > 0:
+          return True
+      else:
+          return False
+
+  def getQuestEncounter(self, questProgress:dict) -> Mob:
+      success = {key:value for key, value in questProgress.items() if self.checkQuestEncounters(key, int(value))}
+      if len(success) == 0:
+          return False
+      k = list(success)[0]
+      return self.questEncounters[k + "|" + str(success[k])], k + "|" + str(success[k])
+      
+  def questEncounterWin(self, value):
+      self.questEncounters[value] -= 1
+      
+  
 
 tile1 = Tile((reset + "You awaken in a forest of pines"), (reset + "The trees stretch tall and thick, as piles of pine needles and small herbs cling to the ground."), 1, {"North":2, "South":5, "East":3, "West":4}, lootTable={"Rolls":1, "Pine Twig":1, "Nothing":30})
 
-tile2 = Tile((reset + "A burbling brook sounds off ahead."), (reset + "You spot the outline of a building off to the northwest."), 2, {"South":1, "West":6, "East":7})
+tile2 = Tile((reset + "A burbling brook sounds off ahead."), (reset + "You spot the outline of a building off to the northwest."), 2, {"North":29, "South":1, "West":6, "East":7})
 
-tile3 = Tile((reset + "A very large tree stands before you, its crown scraping the sky."), (reset + "The tree rises, as clouds float through its needles."), 3, {"North":7, "West":1}, lootTable={"Rolls":1,"Mushroom":1, "Nothing":35}) #Make this climbable eventually
+tile3 = Tile((reset + "A very large tree stands before you, its crown scraping the sky."), (reset + "The tree rises, as clouds float through its needles."), 3, {"North":7, "South":30, "West":1}, lootTable={"Rolls":1,"Mushroom":1, "Nothing":35}) #Make this climbable eventually
 
-tile4 = Tile((reset + "The trees give way to a dirt road cutting through the wilderness."), ("A serene road stretches through the forest, as off to the north, lies a fortress sitting atop a hill."), 4, {"North":6, "South":8, "East":1})
+tile4 = Tile((reset + "The trees give way to a dirt road cutting through the wilderness."), ("A serene road stretches through the forest, and off to the north, lies a fortress sitting atop a hill."), 4, {"North":6, "South":8, "East":1})
 
-tile5 = Tile((reset + "The leaves wave in the wind. A damp draft curls around your feet."), (reset + "You spot a cave, further down south, its entrance covered slightly by vegetation."), 5, {"North":1, "South":9})
+tile5 = Tile((reset + "The leaves wave in the wind. A damp draft curls around your feet."), (reset + "You spot a cave, further down south, its entrance covered slightly by vegetation."), 5, {"North":1, "South":9, "East":30})
 
 tile6 = Tile((reset + "A hill rises, a mound that rises slowly above the ground.\nAtop which lies a fortress of stone."), (reset + "While climbing the hill, the clamor of those within the fortress grows louder and louder."), 6, {"North":10, "South":4, "East":2})
 
-tile7 = Tile((reset + "A river rushes before you, running through the forest."), ("You spot fish swimming in these shallows"), 7, {"South":3, "West":2}, interactible=True)
+tile7 = Tile((reset + "A river rushes before you, running through the forest, over gathered stones and rarely interrupted by a small form darting through its waters."), ("You spot fish swimming in these shallows."), 7, {"South":3, "West":2}, interactible=True)
 
-tile8 = Tile((reset + "The trees come very close to the well-travelled road.\nRoots frame the sides of the road, branches towering over a road that flashes of points of light dancing as the shadows of pine needles move."), (reset + "You spot a curve in the road as it goes south, where it turns to the west."), 8, {"North":4, "East":9})
+tile8 = Tile((reset + "The trees come very close to the well-travelled road.\nRoots frame the sides of the road, branches towering over a road that flashes of points of light dancing as the shadows of pine needles move."), (reset + "You spot a curve in the road as it goes south, where it turns to the east."), 8, {"North":4, "West":9, "South":28})
 
-tile9 = Tile((reset + "A yawning cave opening is before you, as small sticks are strewn about.its entrance."), (reset + "The ground is damp, the dirt cool and watered."), 9, {"North":5, "West":8}, interactible=True, repNoEncounterText=("The animals reluctantly welcome your presence in their homes."),findNoEncounterText=("You feel like you are being watched by a few creatures nearby."),noMoreMobsText=(reset +"All that's left here, are the stones that line the entrance, and the trees around it.\nIt's quite quiet here."), encounter=hungryWolf, encounterChance=20)
+tile9 = Tile((reset + "A yawning cave opening is before you, as small sticks are strewn about.its entrance."), (reset + "The ground is damp, the dirt cool and watered."), 9, {"North":5, "East":33, "West":28}, interactible=True, repNoEncounterText=("The animals reluctantly welcome your presence in their homes."),findNoEncounterText=("You feel like you are being watched by a few creatures nearby."),noMoreMobsText=(reset +"All that's left here, are the stones that line the entrance, and the trees around it.\nIt's quite quiet here."), encounter=hungryWolf, encounterChance=20)
 
 tile10 = Tile((reset + "You arrive at the gates of the fortress, guarded by armored humans hefting long, crescent-tipped pikes.\nAll the while, a rare person walks down the path to enter the fortress."), (reset + "The guards look at you strangely as you search around the hill before the fortress gates.\nThis fortress was certainly a structure built for war, as you spot intricate, durable, masonry,\n with the little telltale holes of arrow slits by the sides of the gateway, a heavy iron gate raised above this vaunted corridor."), 10, {"North":11,"South":6}, tileNotFoundText=(gold + "There's no point in trying to walk through walls."), interactible="Random", entryEncounter=True, encounterChance=100)
 
@@ -378,7 +431,7 @@ tile12 = Tile((reset + "You find a long, stretching, road, its cobblestones obsc
 
 tile13 = Tile((reset + "The northern road leads to the main guildhall, where stone gargoyles stare downward over two massive wooden doors."), ("You spot that various colorful depictions of the adventurers of old are painted into the stained glass."), 13, {"North":18, "South":11, "West":17}, tileNotFoundText=(gold + "The walls of the arena do not present an entrance for you to go through."))
 
-tile14 = Tile((reset + "The eastern road leads to a massive circular stone building, the walls of this edifice engraved with depictions of battle."), ("You see that this place is called the Arena, where glorious battle could be done between you and other powerful opponents, without any risk of death."), 14, {"North":19, "West":11})
+tile14 = Tile((reset + "The eastern road leads to a massive circular stone building, the walls of this edifice engraved with depictions of battle."), ("You see that this place is called the Arena, where glorious battle could be done between you and other powerful opponents, without any risk of death."), 14, {"North":19, "West":11}, tileNotFoundText=(gold + "You find that you cannot walk through the walls of houses."))
 
 tile15 = Tile((reset + "There is a large tower here, that stands tall and flies the banners of the Moonreach Guild."), "The tower's doors are locked.", 15, {"North":12}, tileNotFoundText="It doesn't seem like the other buildings here are for you to intrude upon.")
 
@@ -388,9 +441,39 @@ tile17 = Tile((reset + "North of the market road, lies a group of shops more lav
 
 tile18 = Tile((reset + "The main keep of the fortress is right before you, a pair of stone gargoyles grinning over the heads of a pair of heavily-armored guardsmen."), (reset + "The heavy wooden doors open wide into a long, vaunted, hall, a carpet of scarlet red stretching and branching off into the cathedral-like interior of the castle keep."), 18, {"North":20, "South":13})
 
-tile19 = Tile((reset + "Even the arena's entrance gate is a grand sight, as effigies of past champions stand vigil in poses of victory, as plaques detail their exploits."), (reset + "You read the plaques: \nHaerclus Asmitheus, the Lord of Hunger, who ate his opponents alive when they failed.\nRevei Kroni, the Red Baron, who crushed his enemies with his unwavering will.\nGarth Karnis, the Champion of Steel, who had never been injured in a single match.\nEir Goromir, the Bone-Crusher, who turned his enemies to dust under his hammer larger than boulders.\nBead Tyrhall, the Ash Harpy, who burnt her enemies to piles of ash.\nGiorkkos, the Cloudy Day, who slew a full arena of fighters with a single spell."), 19, {"North":20, "South":14}, tileNotFoundText=(gold + "You don't find it a good idea to walk over open air, not knowing how to fly.")) #Add the Arena interactible here. May have an arena shop merchant who has random stuff in their sell dictionary.
+tile19 = Tile((reset + "Even the arena's entrance gate is a grand sight, as effigies of past champions stand vigil in poses of victory, as plaques detail their exploits."), (reset + "You read the plaques: \nHaerclus Asmitheus, the Lord of Hunger, who ate his opponents alive when they failed.\nRevei Kroni, the Red Baron, who crushed his enemies with his unwavering will.\nGarth Karnis, the Champion of Steel, who had never been injured in a single match.\nEir Goromir, the Bone-Crusher, who turned his enemies to dust under his hammer larger than boulders.\nBead Tyrhall, the Ash Harpy, who burnt her enemies to piles of ash.\nGiorkkos, the Cloudy Day, who slew a full arena of fighters with a single spell."), 19, {"South":14}, tileNotFoundText=(gold + "You don't find it a good idea to walk over open air, not knowing how to fly.")) #Add the Arena interactible here. May have an arena shop merchant who has random stuff in their sell dictionary.
 
-tile20 = Tile((reset + "The grand chamber of the main guild-hall branches off into many rooms through halls on its eastern and western walls."), (reset + "Painted murals of past victories, of adventurer-heroes of the old who slew grotesque monsters are depicted hanging on the walls."), 20, {"South":18})
+tile20 = Tile((reset + "The grand chamber of the main guild-hall branches off into many rooms through halls on its eastern and western walls."), (reset + "Painted murals of past victories, of adventurer-heroes of old who slew grotesque monsters are depicted hanging on the walls."), 20, {"North":24, "South":18, "East":21, "West":23})
+
+tile21 = Tile((reset + "Past a statue of a winged man, lies a large hall,\nwith a floor of stone tiling leading up to a room lit to display a wall with papers tacked all over its surface."), (reset + "You spot that the tiles on the floor are inscribed with the names of all those who had fallen, and died during their quests."), 21, {"West":20, "East":22}, tileNotFoundText=(gold + "The walls are in your way."), interactible=moonreachQuestHall) #Quest Hall interactible
+
+tile22 = Tile((reset + "A desk with a brightly-smiling woman that greets all who enter the hall lies before you."), (reset + "A stack of parchment and an feather pen and inkwell are placed upon the table."), 22, {"West":21}, tileNotFoundText=(gold + "The walls are in your way."))
+
+tile23 = Tile((reset + "Past a statue of a thin, reedy, man in a businesslike suit, lies an open common plaza, with doorways opening off to numerous personal residences."), (reset + "You spot a perfect model of a mirror-like lake at the bottom of a group of rocky crags."), 23, {"East":20}, tileNotFoundText=(gold + "These other residences are not for you to intrude upon."))
+
+tile24 = Tile((reset + "The hall stretches for quite the long way, the vaunted ceiling draped with the purple and silver colors of the Moonreach Guild, a grand and ornate site to display awe upon the visitor."), (reset + "You spot an ornate door leading off to a kingly chamber past the end of this great hall."), 24, {"North":27, "South":20, "East":25, "West":26})
+
+tile25 = Tile((reset + "Past a statue of a lady with three eyes, lies a pair of closed doors, where beyond lies a room of absolute quiet."), (reset + "Stacks of books that stretch and span the room, an interior lit by spiraling magic circles that fly in the sky, as a serene room of study spans outward around you."), 25, {"West":24}, tileNotFoundText=(gold + "The walls of books and shelves lead you round and round, till you return right where you began.")) #Library interactible.
+
+tile26 = Tile((reset + "An empty-ceiling room lies here, a single man dressed in loose robes standing in its center. He seems to be engrossed in a series of artful strikes against an invisible opponent."), (reset + "The room opens into the clear sky above, sunny light shining down on fluffy clouds that float through the towers of the guild hall roof."), 26, {"West":24}) #Yin Nagata NPC, may challenge player.
+
+tile27 = Tile((reset + "Past a statue of a spear-wielding lady with a prideful smile, lies a spacious office, with a horned Demon and his assistant working together, poring over stacks upon stacks of parchment laid across their beautifully carved wooden table."), (reset + "There lie a multitude of tapestries and varied trophies hanging on the walls and meticulously shelved, ever-more displaying this guild as that of hunters, hunters who hunted the big game of the wild."), 27, {"South":24}, tileNotFoundText=(gold + "You cannot find yourself walking through the walls of this office.")) #Guildmaster Chrys NPC
+
+tile28 = Tile((reset + "A bend in the road is here, where one end stretches to the north, and another, into the brush of the east."), (reset + "Being further from civilization, this segment of the road is significantly more overgrown with weeds than that of the north."), 28, {"North":8, "East":9}, questFlavorText={"Bandits|1":"You come upon a wrecked wagon, with its drawing oxen slain with arrows in their eyes, and a wagon wheel crushed against the dirt."}, questSearchText={"Bandits|1":"It's clear what happened here. The caravan was ambushed, with human tracks of at least three men that lead off into the west."})
+
+tile29 = Tile((reset + "Water runs over smoothened river stones, clear water reflecting the light of day in your eyes, as moss covered stones wall its sides in verdant green."), (reset + "You spot a wooden bridge going over the stream, crossing the water and crafted of logs tied by water-soaked rope."), 29, {"South":2}) #Tilenotfound should be being blocked by fortress walls.
+
+tile30 = Tile((reset + "A fallen log lies here, the bough of an elder tree long dead, overgrown with smaller plants and mushrooms hidden beneath."), (reset + "You spot a rabbit hole nearly hidden beneath the rotting log."), 30, {"North":3, "South":33, "East":31, "West":5})
+
+tile31 = Tile((reset + "Moss creeps over the bark of these trees, forming a layer of green over thick trunks as wide as two men."), (reset + "Creeping vines flowering with small yellow blooms drape over the mosses."), 31, {"West":30, "South":32}, findNoEncounterText=("You feel like you are being stalked amongst these trees, only seeing faint shifts in the dry needles over the ground."), repNoEncounterText=("The gaze from within these trees is neutral, perhaps even friendly, as Nature welcomes you in its wild lands."), noMoreMobsText=("Light breezes flow through the trees, carrying faint birdsong from further lands."), encounter=forestWolf, encounterChance=16)
+
+tile32 = Tile((reset + "The forest's floor is covered with encroaching smaller plants that cover the soil between the trees, while a forest trail stretches from the west to the east."), (reset + "You see that these plants are constructed of little fronds, who hold small leaves growing upon them, where occasionally, you spot tiny sacs beneath a leaflet."), 32, {"North":31, "West":33}, lootTable={"Rolls":1, "Northern Fern Spore-Sac":25, "Nothing":75})
+
+tile33 = Tile((reset + "The dirt rises into a hill to the west, as more uneven ground breaks into the forest, the dirt now filled with myriad small chips of rock."), (reset + "Among these shards of stone that lie on the forest floor, you spot a shattered half of a weathered boulder, half of its form cleaved away, revealing a grievous wound in a once large rock."), 33, {"North":30, "West":9, "East":32})
+
+tile34 = Tile((reset + "Deeper into the forest, you spot the branches close together, as pine fronds intersect each other, each seeking for, and turning the sun's rays into thin points of light on the dirt."), (reset + "Life seems to be flourishing, in the places shaded by tree leaves, as small plants with purple sickle-shaped leaves growing amongs knotted roots."), 34, {"South":35, "East":28}, questFlavorText=(reset + "Bloodied tracks lead down to the south. You feel that your quarry is close, perhaps even watching you, already."), questSearchText=(reset + "An acrid smell fills the air, the smell of overcooked, charred, meat."))
+
+tile35 = Tile((reset + "A small clearing lies here, where there could have once been a great tree stretching into the skies, reduced to a moss-grown table of circle-marked wood."), (reset + "Small yellow flowers dot the green carpeting over the ground, as the clear blue skies show above in the sky, opening a window of sunlight into the clearing guarded by brown-clad sentries."), 35, {"North":34})
 
 dungeonTile1 = Tile((reset + "The interior is cool, as your feet tap against the stone of the floor."), (reset + "Light still comes from the entrance, as greenery shows beyond the cool, dark, cave.\nYou notice that the tunnels branch into two directions."), -1, {"East":-2}, tileNotFoundText=(gold + "You bump into a stone wall in the darkness."), interactible=True, repNoEncounterText=("The hungry wolves decide not to attack you for food, though have none to spare for you."), findNoEncounterText=("Faint shapes flicker through the shadows, as light snarls caress the very edges of your hearing."), noMoreMobsText=("The cave has fallen silent, leaving only dimly-lit rocks glistening of moisture."), encounter=hungryWolf, encounterChance=20)
 
@@ -403,4 +486,6 @@ dungeonTile4 = Tile((reset + "You are in a large cavern, with a steep drop away 
 
 dungeonTile5 = Tile((reset + "Most of the cave's inhabitants appear to be quite shy of your intrusion, making themselves scarce whenever you come near."), (reset + "A patch of glowing mushrooms grows by the side of a pool of water, filled by the steady drip of water dropping from the ceiling."), -5, {"North":-4}, encounter=caveCrawler, encounterChance=8, findNoEncounterText="You hear the lumbering of large creatures in the darkness. Who knew that things in a cave like this could grow to such sizes?", noMoreMobsText="It's a serene environment indeed, as the rhythmic plip, plop, of water droplets sounds in your ears, a rhythmic, slow, noise.")
 
-tilesDict = {1:tile1, 2:tile2, 3:tile3, 4:tile4, 5:tile5, 6:tile6, 7:tile7, 8:tile8, 9:tile9, 10:tile10, 11:tile11, 12:tile12, 13:tile13, 14:tile14, 15:tile15, 16:tile16, 17:tile17, 18:tile18, 19:tile19, 20:tile20, -1:dungeonTile1, -2:dungeonTile2, -3:dungeonTile3, -4:dungeonTile4, -5:dungeonTile5}
+tilesDict = {1:tile1, 2:tile2, 3:tile3, 4:tile4, 5:tile5, 6:tile6, 7:tile7, 8:tile8, 9:tile9, 10:tile10, 11:tile11, 12:tile12, 13:tile13, 14:tile14, 15:tile15, 16:tile16, 17:tile17, 18:tile18, 19:tile19, 20:tile20, 21:tile21, 22:tile22, 23:tile23, 24:tile24, 25:tile25, 26:tile26, 27:tile27, 28:tile28, 29:tile29, 30:tile30, 31:tile31, 32:tile32, 33:tile33, 34:tile34, -1:dungeonTile1, -2:dungeonTile2, -3:dungeonTile3, -4:dungeonTile4, -5:dungeonTile5}
+
+interactionDict = {9:interact1, -1:interact2, 7:resource1, 10:interact3, 12:interact4, 16:crafting1, 21:moonreachQuestHall}

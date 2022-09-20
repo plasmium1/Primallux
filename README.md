@@ -1,4 +1,3 @@
-
 -------------------------
 | Welcome to Primallux! |
 -------------------------
@@ -79,6 +78,7 @@ We have:
 - Quests! Go on quests, and experience a structured storyline, all the while gathering a reward as you go!
 - More dungeons! And, of course, a dungeon Boss for the cave!
 - Faction disputes! In specific global times, a global event will come that likely changes many things in various encounters while the game goes on!
+- Arena system with PVP!
 
 
 -------------------------
@@ -87,3 +87,5 @@ We have:
 @plasmium (Lead Developer (and pretty much the only one.))
 
 @fallenhuman4 (plasmium's alt)
+
+@SSoup64 (vietnam)

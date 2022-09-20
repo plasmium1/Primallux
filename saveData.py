@@ -1,6 +1,5 @@
-#Unused because Repl doesn't let pickle access the save files. Shifted to using Repl DB
+#Unused because Repl doesn't let pickle access the save files. Shifted to using Repl DB. Works perfectly when you get this in a personal version though, which is hilarious.
 import pickle
-from ansi.colour import fg
 from ansi.colour.rgb import rgb256
 from ansi.colour.fx import reset
 
@@ -37,7 +36,7 @@ def login():
     character = pickle.load(file)
     file.close()
     return character
-  except (OSError, IOError) as e:
+  except (OSError, IOError):
     print(red + "One or more of the entered information is incorrect. Please try again.", reset)
     accountBool = False
     login()

@@ -56,7 +56,7 @@ class StatusEffect:
 
   def __str__(self):
     string = ""
-    string += self.name + " " + int_to_Roman(self.level) + " "
+    string += self.name + " " + int_to_Roman(self.level) + ": "
     for key, value in self.effect.items():
       if value > 0:
         string += green + key + " +" + str(value) + " "

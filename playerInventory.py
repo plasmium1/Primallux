@@ -1,6 +1,8 @@
 from ansi.colour.rgb import rgb256
 from ansi.color.fx import reset
 from random import randint
+from magic import effectDict
+import copy
 black = "\u001b[30m"
 red = "\u001b[31m"
 green = rgb256(0x00, 0xff, 0x09)
@@ -47,6 +49,8 @@ class InvItem(object):
       return False
   def getItemName(self):
     return self.itemName
+  def getColoredName(self):
+    return self.typeColor + self.itemName
   def getItemType(self):
     return self.itemType
   def getItemAmount(self):
@@ -94,6 +98,11 @@ class ConsumableItem(InvItem):
         appendedString += appendedString + color + key + " " + str(value) + ", "
       else:
         appendedString += appendedString + color + key + " " + str(value)
+      if len(self.effects) != 0:
+        for i in self.effects:
+            eff = copy.copy(effectDict[i.split("|")[0]])
+            eff.setLevel(int(i.split("|")[1]))
+            appendedString += ", " + str(eff)
     return self.typeColor + self.itemName + cyan + ": " + str(self.amount) + appendedString
   
   def getBonusDict(self):
@@ -235,11 +244,13 @@ wolfPelt = InvItem("Misc", "Wolf Pelt", 0)
 koboldEye = InvItem("Misc", "Kobold Eye", 0)
 quartzStone = InvItem("Misc", "Quartz Stone", 0)
 fungusIchor = InvItem("Misc", "Fungus Ichor", 0)
+northFernSporeSac = InvItem("Misc", "Northern Fern Spore-Sac", 0)
 heavyChitinPlate = InvItem("Misc", "Heavy Chitin Plate", 0)
 
 mushroom = ConsumableItem("Mushroom", 0, {"Current HP":15})
 freshPerch = ConsumableItem("Fresh Perch", 0, {"Current HP":20})
-roastRabbit = ConsumableItem("Roast Rabbit", 0, {"Current HP":25}, effects=("Hearty Meal|1",))
+roastBeanSkewer = ConsumableItem("Roast Bean Skewer", 0, {"Current HP":15}, effects=("Hearty Meal|1",))
+roastMushroomSkewer = ConsumableItem("Roast Mushroom Skewer", 0, {"Current HP":22}, effects={"Hearty Meal|1"})
 insectFlesh = ConsumableItem("Insect Flesh", 0, {"Current HP":10}, effects=("Food Poisoning|1",))
 potionOfSight = ConsumableItem("Potion of Sight", 0, {}, effects=("Improved Sight|1",))
 
@@ -247,15 +258,19 @@ potionOfSight = ConsumableItem("Potion of Sight", 0, {}, effects=("Improved Sigh
 
 identifierDict = {"Fresh Perch":freshPerch,
                   "Fungus Ichor":fungusIchor,
+				  "Heavy Chitin Plate":heavyChitinPlate,
+				  "Insect Flesh":insectFlesh,
                   "Iron Dagger":ironDagger,
                   "Kobold Eye":koboldEye,
                   "Kobold Leather Tunic":koboldLeatherTunic,
+                  "Northern Fern Spore-Sac":northFernSporeSac,
                   "Mushroom":mushroom,
                   "Plated Leather Jerkin":platedLeatherJerkin,
                   "Pine Twig":pineTwig,
                   "Potion of Sight":potionOfSight,
                   "Quartz Stone":quartzStone,
-                  "Roast Rabbit":roastRabbit,
+                  "Roast Bean Skewer":roastBeanSkewer,
+                  "Roast Mushroom Skewer":roastMushroomSkewer,
                   "Wolf Fang":wolfFang,
                   "Wolf Pelt":wolfPelt}
 

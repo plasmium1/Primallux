@@ -2,9 +2,7 @@ Finish magic system
 
 Add more tiles
 
-Add the Moonreach Guild so gold and quests can be gained (Working on this, too) <- Almost done!
-
-Make quests a thing
+Add the Moonreach Guild so gold and quests can be gained (Only need to finish interactions!)
 
 Actually implement the timer function (Done for status effects, untested for resource regen (this is implemented), night/day cycles and other time-varying conditionals also not implemented, random event cycles also not implemented)
 
@@ -17,6 +15,8 @@ Make resource tiles work, and test it out - (FINISHED)
 Work out nighttime at specific turn intervals. I'm thinking of making it every 250? 500? turns.
 
 Arena system: (Either I can try to make this multiplayer or keep it nice and simple and just go single.)
+Wins in arena give "Carnage Points" to be redeemed for certain special loot.
+
  - Multiplayer:
  -> One player does a move
  -> The other player does a move
@@ -27,12 +27,6 @@ Arena system: (Either I can try to make this multiplayer or keep it nice and sim
  -> Just like a normal monster fight but this one offers extra rewards like Reputation or maybe even a special currency only offered at arenas to push people there more often. Arena scales up/down in terms of difficulty depending on how well the player's been doing in the Arena (KDR, and player stat totals).
 
 Dialogue system <- Finished!
- - This uses various different characters in its key string to specify conditions that need to be met for a specific response.
- -- The someLetter) character, followed by literally a closing parenthesis, specifies what character needs to be inputted to choose that response.
- -- The | character is a split character, and should be checked fairly late in the chain. It's to check the conditionals like Turns and Quests. This HAS to be included in every single dialogue.
- -- The & character marks what round of talking it is. Best to put this after the Conditional if there is one.
- -- The ^ character marks what sort of follow-up message group comes after selecting a specific preceding response. Ex: {"a)Greet the person":"Hello!", "d)Ask them how they're doing^a":"I'm doing well, thanks!"} -> (Select a):"Hello!" (print d)Ask them how they're doing):"I'm doing well, thanks!"
- --- NOTE: ALWAYS PUT THIS AT THE END. 
 
 Merchant system:
  - Buy items (FINISHED)
@@ -44,14 +38,26 @@ Haggling system (FINISHED!):
  - Each time the value increases when the player's buying, the merchant is more likely to accept, while if it's >= than the original value, the merchant accepts immediately, provided the player has the money. Opposite applies when value is decreased when buying.
  - Player can freely set the new price, just that price cannot go below 0.
 
-Crafting: (FINISHED, HELL YEAH) (well, the system works, but most of these aren't implemented)
+Crafting: (FINISHED, HELL YEAH) (Finished and tested)
  - Smithing (Forge) < Mining 
  - Alchemy (Cauldron) < Herbalism
  - Tinkering (Workbench) < Salvaging
  - Jeweling (Toolkit) < Mining
  - Runation (Inscription Pen) < Mining/Salvaging
  - Cooking (Pot) < Fishing/Hunting
+At certain levels in the crafting skills, there may be additional bonuses like increased yield, maybe even a modifier system for making more customized crafting recipes?
+At certain levels in the gathering skill, there may be additional bonuses like increased yield.
 
-Tile searching respawns and monster respawns. (FINISHED)
+Tile searching respawns, rss respawns, and monster respawns. (FINISHED)
+
+Make item description viewing a thing?
+
+Creating an alternate Personal version meant to be downloaded and not quite run on Repl.it, with the original data saving system that works with files rather than the Repl DB
+
+Quests (Actual quests not finished, but system works.)
+
+Quest hall interactible!!! (Added, untested)
+
+Library interactible for managing buying into skill levels and handling item enchantment.
 
 putting (FINISHED) at the end of things is hella satisfying lol

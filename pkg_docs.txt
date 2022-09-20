@@ -1,0 +1,28 @@
+Package Docs.
+
+Dialogue system <- Finished!
+ - This uses various different characters in its key string to specify conditions that need to be met for a specific response.
+ -- The (insertSomeLetter) character, followed by a closing parenthesis, specifies what character needs to be inputted to choose that response. Ex: a), b), abc)
+ -- The | character is a split character, and should be checked fairly late in the chain. It's to check the conditionals like Turns and Quests. This NEEDS to be included in every single dialogueRounds feature, even if you put nothing after it.
+ -- The & character marks what round of talking it is. Best to put this after the Conditional if there is one.
+ -- The ^ character marks what sort of follow-up message group comes after selecting a specific preceding response. Ex: {"a)Greet the person":"Hello!", "d)Ask them how they're doing^a":"I'm doing well, thanks!"} -> (Select a):"Hello!" (print d)Ask them how they're doing):"I'm doing well, thanks!"
+ --- NOTE: ALWAYS put the above statement AFTER the & statement.
+ -- The # symbol marks that this statement can only be said if the player has toggled the NPC's "metBefore" argument.
+ -- The ` symbol marks that this statement can only be said if the player has not toggled the NPC's "metBefore" argument.
+ -- The $ symbol marks that the statement makes the NPC give you a Quest or an Item as specified afterward or just about anything.
+ --- This statement MUST come before the "=" statement.
+ -- The * symbol marks that the statement does not advance you in a dialogue round.
+ -- The @ symbol brings the player back to round 1.
+ -- The expression after = marks that what is between is a quest argument. "(questName)/(Stage #)/[Toggle Talk quest] or [Give NPC item]/itemName/ (item amount optional)"
+ --- Recommended to put the "=" expression after a selected dialogue message.
+ --- Note: For readability, try putting a g)Goodbye|&Round 1 marker at the end of each dialogueRounds.
+
+Quests:
+ -- QuestChainTuple is a tuple of Objective objects. Stage is the index of the objective in the tuple minus 1.
+ -- QuestChainTextDict is a dict of text. Keys are marked like so:
+ --- "Stage #|Tile #"
+ --- Without stage number specified, the text will show up on the tile no matter what.
+
+Tiles:
+ -- QuestEncounters expects a dictionary of the following:
+ ---> {"Quest Name|Quest Objective Stage":[mob, amount]})
