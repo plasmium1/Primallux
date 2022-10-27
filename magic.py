@@ -163,7 +163,7 @@ class Magic:
     
 bleed = StatusEffect("Bleed", 1, 8, "player", 0, effect={"HP":-1}, scaling=1, durationScaling=1)    
 deafen = StatusEffect("Deafen", 1, 6, "player", 0, effect={"Damage":-4, "Dexterity":-5}, scaling=2)
-blinded = StatusEffect("Blinded", 1, 3, "player", 0, effect={"Dexterity":-20}, scaling=2)
+blinded = StatusEffect("Blinded", 1, 3, "player", 0, effect={"Dexterity":-20}, scaling=5)
 foodPoisoning = StatusEffect("Food Poisoning", 1, 28, "player", 0, effect={"Dexterity":-2, "Constitution":-4, "Current HP":-20, "Max HP":-20}, scaling=2, durationScaling=1)
 heartyMeal = StatusEffect("Hearty Meal", 1, 30, "player", 0, effect={"Damage":4, "Dexterity":3}, scaling=2, durationScaling=4)
 improvedSight = StatusEffect("Improved Sight", 1, 40, "player", 0, effect={"Perception":4}, scaling=3, durationScaling=8)
@@ -171,6 +171,7 @@ improvedSight = StatusEffect("Improved Sight", 1, 40, "player", 0, effect={"Perc
 discordantShriek = Magic("Discordant Shriek", "Effect", 16, 2, 2, "player", effects=["Deafen"])
 bleedingStrike = Magic("Bleeding Strike", "Effect", 20, 1, 2, "player", effects=["Bleed"], scaling=1, damage=6, damageScaling=2, cooldownScaling=1)
 blindingFlash = Magic("Blinding Flash", "Effect", 10, 1, 5, "player", scaling=1, effects=["Blinded"])
+heavyStrike = Magic("Heavy Strike", "Damage", 25, 1, 3, "player", damage=48, damageScaling=6, cooldownScaling=1, costScaling=5)
 
 effectDict = {"Deafen":deafen, "Bleed":bleed, "Blinded":blinded, "Food Poisoning":foodPoisoning, "Hearty Meal":heartyMeal, "Improved Sight":improvedSight}
-spellDict= {"Discordant Shriek":discordantShriek, "Bleeding Strike":bleedingStrike, "Blinding Flash":blindingFlash}
+spellDict= {"Discordant Shriek":discordantShriek, "Bleeding Strike":bleedingStrike, "Blinding Flash":blindingFlash, "Heavy Strike":heavyStrike}

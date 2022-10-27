@@ -1,4 +1,5 @@
 from ansi.colour.rgb import rgb256
+from monsters import mobDict
 
 black = "\u001b[30m"
 red = "\u001b[31m"
@@ -66,7 +67,7 @@ class Objective:
 
     def __str__(self):
         string = ""
-        if type == "Kill":
+        if self.type == "Kill":
             string = red + self.type
             string += " " + self.amount
             string += " " + str(self.mob)
@@ -74,7 +75,7 @@ class Objective:
                 string += "s"
             if self.locationName != "":
                 string += " at " + self.locationName
-        elif type == "Fetch":
+        elif self.type == "Fetch":
             string = orange + self.type
             string += " " + self.amount
             string += " " + str(self.item)
@@ -82,7 +83,7 @@ class Objective:
                 string += "s"
             if self.locationName != "":
                 string += " at " + self.locationName
-        elif type == "Give":
+        elif self.type == "Give":
             string = yellow + self.type
             string += " " + self.amount
             string += " " + self.item.getColoredName() 
@@ -90,16 +91,16 @@ class Objective:
                 string += "s"
             string += " to " + self.npcName
             string += " at " + self.locationName
-        elif type == "Scout":
+        elif self.type == "Scout":
             string = cyan + self.type
             string += " out the " + self.locationName
-        elif type == "Go":
+        elif self.type == "Go":
             string = cyan + self.type
             string += " to " + self.locationName
-        elif type == "Clear":
+        elif self.type == "Clear":
             string = purple + self.type
             string += " out " + self.locationName
-        elif type == "Talk":
+        elif self.type == "Talk":
             string = green + self.type
             string += " to " + self.npcName
             string += " at " + self.locationName
@@ -129,11 +130,12 @@ class Objective:
     def incrementAmount(self):
         self.currentAmount += 1
 
-objective1 = Objective("Scout", 1, "Fortress Southern Road", (28,))
-objective2 = Objective("Scout", 2, "Bandit Camp", (34,))
-# objective3 = Objective("Clear", 3)
+objective1 = Objective("Scout", 1, "Fortress Southern Road", location=(28,))
+objective2 = Objective("Scout", 2, "Bandit Camp", location=(34,))
+objective3 = Objective("Clear", 3, "Bandit Camp", location=(35,))
+objective4 = Objective("Kill", 4, "Bandit Camp", location=(35,), mob=mobDict["Bandit Leader Toderick"])
 
-quest1 = Quest("Bandits", "A group of bandits have been ambushing trade caravans coming to the Moonreach Fortress for a while now. And the Guild wants you to find them and clear them out.", 4, "To begin, the Guild wishes for you to investigate the disappearance of a traveling merchant who was coming to the fortress.", (objective1, objective2), reward={"Ghost Silver":50, "XP":30})
+quest1 = Quest("Bandits", "A group of bandits have been ambushing trade caravans coming to the Moonreach Fortress for a while now. And the Guild wants you to find them and clear them out.", 4, "To begin, the Guild wishes for you to investigate the disappearance of a traveling merchant who was coming to the fortress.", (objective1, objective2, objective3, objective4), reward={"Ghost Silver":50, "XP":30})
 
 questsDict = {"Bandits":quest1}
 moonreachQuests = ("Bandits",)

@@ -233,11 +233,21 @@ class Recipe:
     return self.skillLevelRequired
 #Define items and assign ID tags
 pineTwig = EquipmentItem("Weapon","Pine Twig", 0, {"Item Damage":2})
-wolfFang = EquipmentItem("Weapon", "Wolf Fang", 0, {"Item Damage":randint(5,8)})
-ironDagger = EquipmentItem("Weapon", "Iron Dagger", 0, {"Item Damage":randint(6,10)})
+wolfFang = EquipmentItem("Weapon", "Wolf Fang", 0, {"Item Damage":4})
+ironDagger = EquipmentItem("Weapon", "Iron Dagger", 0, {"Item Damage":5, "Dexterity":2})
+ironShortSword = EquipmentItem("Weapon", "Iron Short Sword", 0, {"Item Damage":7, "Dexterity":1})
+ironLongsword = EquipmentItem("Weapon", "Iron Longsword", 0, {"Item Damage":9})
+ironSpear = EquipmentItem("Weapon", "Iron Spear", 0, {"Item Damage":8, "Crit Chance":0.05})
+woodcuttersJaggedAxe = EquipmentItem("Weapon", "Woodcutter's Jagged Axe", 0, {"Item Damage":10, "Dexterity":-1})
+banditCleaver = EquipmentItem("Weapon", "Bandit Cleaver", 0, {"Item Damage":11, "Crit Chance":0.03, "Dexterity":1})
 
 koboldLeatherTunic = EquipmentItem("Chest", "Kobold Leather Tunic", 0, {"Defense":2})
-platedLeatherJerkin = EquipmentItem("Chest", "Plated Leather Jerkin", 0, {"Defense":4})
+leatherTunic = EquipmentItem("Chest", "Leather Tunic", 0, {"Defense":3})
+studdedLeatherTunic = EquipmentItem("Chest", "Studded Leather Tunic", 0, {"Defense":5})
+leatherPants = EquipmentItem("Legs", "Leather Pants", 0, {"Defense":2, "Dexterity":1})
+woolenShoes = EquipmentItem("Feet", "Woolen Shoes", 0, {"Defense":1, "Dexterity":2})
+skullCap = EquipmentItem("Head", "Skull Cap", 0, {"Defense":2})
+woolenHat = EquipmentItem("Head", "Woolen Hat", 0, {"Defense":1, "Perception":1})
 
 
 wolfPelt = InvItem("Misc", "Wolf Pelt", 0)
@@ -246,6 +256,7 @@ quartzStone = InvItem("Misc", "Quartz Stone", 0)
 fungusIchor = InvItem("Misc", "Fungus Ichor", 0)
 northFernSporeSac = InvItem("Misc", "Northern Fern Spore-Sac", 0)
 heavyChitinPlate = InvItem("Misc", "Heavy Chitin Plate", 0)
+redBannerToken = InvItem("Misc", "Red Banner Token", 0)
 
 mushroom = ConsumableItem("Mushroom", 0, {"Current HP":15})
 freshPerch = ConsumableItem("Fresh Perch", 0, {"Current HP":20})
@@ -256,23 +267,33 @@ potionOfSight = ConsumableItem("Potion of Sight", 0, {}, effects=("Improved Sigh
 
 
 
-identifierDict = {"Fresh Perch":freshPerch,
+identifierDict = {"Bandit Cleaver":banditCleaver, 
+                  "Fresh Perch":freshPerch,
                   "Fungus Ichor":fungusIchor,
 				  "Heavy Chitin Plate":heavyChitinPlate,
 				  "Insect Flesh":insectFlesh,
                   "Iron Dagger":ironDagger,
+                  "Iron Longsword":ironLongsword,
+                  "Iron Short Sword":ironShortSword,
+                  "Iron Spear":ironSpear,
                   "Kobold Eye":koboldEye,
                   "Kobold Leather Tunic":koboldLeatherTunic,
                   "Northern Fern Spore-Sac":northFernSporeSac,
                   "Mushroom":mushroom,
-                  "Plated Leather Jerkin":platedLeatherJerkin,
+                  "Leather Tunic":leatherTunic,
+                  "Leather Pants":leatherPants,
                   "Pine Twig":pineTwig,
                   "Potion of Sight":potionOfSight,
                   "Quartz Stone":quartzStone,
+                  "Red Banner Token":redBannerToken,
                   "Roast Bean Skewer":roastBeanSkewer,
                   "Roast Mushroom Skewer":roastMushroomSkewer,
+                  "Studded Leather Tunic":studdedLeatherTunic,
+                  "Skull Cap":skullCap,
                   "Wolf Fang":wolfFang,
-                  "Wolf Pelt":wolfPelt}
+                  "Wolf Pelt":wolfPelt,
+                  "Woolen Hat":woolenHat,
+                  "Woolen Shoes":woolenShoes}
 
 sightPotRecipe = Recipe({"Kobold Eye":2, "Fungus Ichor":1}, "Potion of Sight", 8, "Alchemy")
 

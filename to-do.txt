@@ -60,4 +60,6 @@ Quest hall interactible!!! (Added, untested)
 
 Library interactible for managing buying into skill levels and handling item enchantment.
 
+Mob defence move for more complex fights.
+
 putting (FINISHED) at the end of things is hella satisfying lol

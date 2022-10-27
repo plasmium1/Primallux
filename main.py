@@ -13,8 +13,6 @@ from quests import Quest, questsDict, moonreachQuests
 import sys
 from itertools import count
 
-
-
 black = "\u001b[30m"
 red = "\u001b[31m"
 green = rgb256(0x00, 0xff, 0x09)
@@ -54,7 +52,7 @@ defaultTileRespawns = {
 defaultTileItems = {
     "Tile 1": 4,
     "Tile 3": 6,
-    "Tile 32":5,
+    "Tile 32": 5,
     "Dungeon Tile 2": 3
 }  #Keeps track of how many items there are for each tile.
 
@@ -99,6 +97,7 @@ def roman_to_int(string):
             i += 1
     return num
 
+
 def properTitle(inp):
     inp = inp.split(" ")
     inp[0] = inp[0].capitalize()
@@ -107,7 +106,7 @@ def properTitle(inp):
     for i in inp[1:-1]:
         if i.lower() not in ("in", "for", "of", "a", "an", "and", "on", "the"):
             inp[n] = i.title()
-        
+
         n += 1
     ret = ""
     for i in inp:
@@ -178,6 +177,7 @@ def stackOverflowPreventer():
     #Prevents stack overflow by warning the user to save and restart when recursion depth grows too deep. Will premptively stop the program before it reaches maximum stack depth. 
 
 """    #Will implement if it becomes a problem.
+
 
 def statAssign():
     #Self explanatory
@@ -307,7 +307,8 @@ def selector():
     print(cyan + " Dwarf" + gold + " (Strength/Constitution)")
     print(cyan + " Demon" + gold + " (Strength/Dark Element)")
 
-    placeholder = checkIn(("h", "e", "d", "human", "elf", "dwarf"), "str")
+    placeholder = checkIn(
+        ("h", "e", "dw", "de", "human", "elf", "dwarf", "demon"), "str")
     if placeholder == "h" or placeholder == "human":
         stats["Charisma"] += 6
         stats["Dexterity"] += 6
@@ -327,6 +328,7 @@ def selector():
         sub_stats["Element Damage"]["Dark"] += 6
         sub_stats["Element Defense"]["Dark"] += 6
         sub_stats["Element Defense"]["Light"] -= 6
+        race = "Demon"
 
     print(cyan + "Pick your character gender:")
     print(" Male" + gold + " (S-Co)")
@@ -402,6 +404,10 @@ def statsCheck():  #In-game stat checker!
         fg.blue("  Learn Chance Bonus (") + gold + "I-W" + fg.blue("): ") +
         green + str(sub_stats["Learn Chance"]) + "%")
     print(fg.blue + "Wisdom (W):" + green, stats["Wisdom"], reset)
+    for key, value in sub_stats["Element Damage"].items():
+        print(blue + key + " Damage: " + gold + str(value) + purple + " | " +
+              blue + key + " Defense: " + gold +
+              str(sub_stats["Element Defense"][key]))
 
 
 def skillsCheck():
@@ -585,9 +591,10 @@ def unequipItems():
             print(red + "Slot already empty.")
             unequipItems()
 
+
 # def inspectItem():
 #     print(purple + "< - Item Inspect - >")
-    
+
 
 #Just check the file cuz I don't wanna print it out here
 def help():
@@ -659,12 +666,25 @@ def levelUp():  #Manage level-ups
     return
 
 
+def elementDamage(targetType: str, element: str, user="Player") -> None:
+    elementColors = {
+        "Fire": orange,
+    }
+    if targetType == "Player":  #Assumes the target is a mob. THIS MAY BE CHANGED in the case that I add a global PVP arena.
+        damageTaken = max(
+            user.getElementalDamage()[element] -
+            sub_stats["Element Defense"][element], 0)
+        sub_stats["Current HP"] -= damageTaken
+        print(red + "Taken " + elementColors[element] + str(damageTaken) +
+              red + " " + element + " damage.")
+
+
 #Fight system. This is going to be filled with bugs I bet.
 def applyEffect(
     effect,
     mob=None,
     target="player"
-):  #Applies an effect to the player or the mob (untested). The status effect affects various stats and alters them accordingly.
+) -> None:  #Applies an effect to the player or the mob (untested). The status effect affects various stats and alters them accordingly.
     effect.setTarget(target)
     if effect.getTarget() == "mob" and mob is not None:
         print(blue + "[ Applied effect to " + mob.getMobName() + blue + " ]",
@@ -827,10 +847,15 @@ def enemyMove(
         print(red + "Your HP: " + str(sub_stats["Current HP"]) + "/" +
               str(sub_stats["Max HP"]))
 
+
 def manaRegen():
     if sub_stats["Current MP"] < sub_stats["Max MP"]:
-        sub_stats["Current MP"] = min(sub_stats["Current MP"] + (stats["Wisdom"] // 2), sub_stats["Max MP"])
-        print(purple + str(sub_stats["Current MP"] + "/" + sub_stats["Max MP"]))
+        sub_stats["Current MP"] = min(
+            sub_stats["Current MP"] + (stats["Wisdom"] // 2),
+            sub_stats["Max MP"])
+        print(purple +
+              str(sub_stats["Current MP"] + "/" + sub_stats["Max MP"]))
+
 
 def monsterFight(mob, tile):
     global turns
@@ -893,7 +918,7 @@ def monsterFight(mob, tile):
                              (sub_stats["Defense"] +
                               stats["Constitution"] * 0.1)), mob.dealDamage()))
             if defenceVar == ["crit"]:
-                print(gold + "< CRITICAL HIT! >", reset)
+                print(gold + "< COUNTER! >", reset)
                 num = 2 * randint(sub_stats["Damage-Lower"],
                                   sub_stats["Damage-Upper"])
                 mob.takeDamage(num)
@@ -998,10 +1023,14 @@ def monsterFight(mob, tile):
     mob.resetDefense()
     mob.resetSpeed()
     mob.resetSpells()
-    fitDict = {key:value for key, value in questProgress.items() if value < len(questsDict[key].getQuestChainTuple())}
+    fitDict = {
+        key: value
+        for key, value in questProgress.items()
+        if value < len(questsDict[key].getQuestChainTuple())
+    }
     killQuests = [
         questsDict[key] for key, value in fitDict.items()
-        if questsDict[key].getQuestChainTuple()[value].getType() == "Kill"
+        if questsDict[key].getQuestChainTuple()[value-1].getType() == "Kill"
     ]
     for i in killQuests:
         questHandler(i, "Check", mob, tile)
@@ -1011,7 +1040,7 @@ def monsterFight(mob, tile):
 #Actually make the adventure?????????
 
 
-def dialogueManager(interaction:Interactible):
+def dialogueManager(interaction: Interactible):
     print(interaction.getDialogue().getGreeting(turns, questProgress))
     dialogueRound = 1
     previousChoice = ""
@@ -1044,9 +1073,9 @@ def dialogueManager(interaction:Interactible):
                                   "You do not have the required amount of " +
                                   arg[3] + ".")
                             break
-                        print(questsDict[arg[0]].getQuestChainTuple()
-                              [questProgress[questsDict[arg[0]].getQuestName()] -
-                               1]).getNPCDialogue()
+                        print(questsDict[arg[0]].getQuestChainTuple()[
+                            questProgress[questsDict[arg[0]].getQuestName()] -
+                            1]).getNPCDialogue()
                         identifierDict[arg[3]].getItemAmount() - amount
 
             if "$" in key:
@@ -1119,7 +1148,7 @@ def dialogueManager(interaction:Interactible):
     print(interaction.getDialogue().getGoodbye(turns))
 
 
-def haggle(haggleType:str, merchantTargetCost:int) -> int:
+def haggle(haggleType: str, merchantTargetCost: int) -> int:
     userInput = checkIn(
         ("yes", "no"), "str",
         (blue + "Would you like to haggle for a new value of the item? "))
@@ -1241,7 +1270,7 @@ def sellManager(variable):
         inventory.pop(userInput.title())
 
 
-def craftingHandler(kind:str, recipes:tuple) -> None: 
+def craftingHandler(kind: str, recipes: tuple) -> None:
     print({
         "Alchemy": (green + "-----{ Alchemist's Cauldron }-----"),
         "Smithing": (orange + "-----{Blacksmith's Forge}-----"),
@@ -1290,36 +1319,48 @@ def craftingHandler(kind:str, recipes:tuple) -> None:
 def questHall():
     global tile
 
-    QHNames = {21:"Moonreach Quest Hall"}
+    QHNames = {21: "Moonreach Quest Hall"}
     print(orange + " -----{ " + QHNames[tile] + " }----- ")
-    action = checkIn(("take", "complete","exit"), "str", (blue + underline + "Take" + reset + blue + "a quest, " + underline + "Complete" + reset + blue + "a quest, or exit."))
-    
-    questHallDict = {21:moonreachQuests}
+    action = checkIn(("take", "complete", "exit"), "str", (
+        f"{blue} {underline}Take {reset} {blue}a quest, {underline}Complete {reset} {blue} a quest, or exit."
+    ))
+
+    questHallDict = {21: moonreachQuests}
     if action == "take":
-        randomQuestList = sample(questHallDict[tile], 3)
-        for i in range(3):
-            print(bold + blue + (i+1) + ": " + reset + str(questsDict[randomQuestList[i]]))
-        lis = range(3)
-        lis.append("exit")
-        val = checkIn(lis, str, (reset + "Select which quest of the above?  ('exit' to leave)" + gold))
+        randomQuestList = questHallDict[tile]  #sample(questHallDict[tile], 3)
+        for i in range(len(randomQuestList)):
+            print(
+                f"{bold} {blue} {str(i + 1)} : {reset} {str(questsDict[randomQuestList[i]])}"
+            )
+        val = checkIn(
+            ["1", "2", "3", "exit"], "str",
+            (reset + "Select which quest of the above?  ('exit' to leave)" +
+             gold))
         if val == "exit":
             return
         else:
-            questHandler(questsDict[randomQuestList[val-1]], "Receive")
+            val = int(val)
+            questHandler(questsDict[randomQuestList[val - 1]], "Receive")
     elif action == "complete":
-        completableQuests = [i for i in questHallDict[tile] if questProgress[i] >= len(questsDict[i].getQuestChainTuple())]
+        completableQuests = [
+            i for i in questHallDict[tile]
+            if questProgress[i] >= len(questsDict[i].getQuestChainTuple())
+        ]
         if len(completableQuests) == 0:
-            print(red + "You have no quests to hand into this " + orange + "Guild Hall" + red + ".")
+            print(red + "You have no quests to hand into this " + orange +
+                  "Guild Hall" + red + ".")
             return
         else:
             for i in completableQuests:
                 print(bold + blue + i)
-            val = checkIn([i.lower() for i in completableQuests], "str", (blue + "Please select a quest to complete. " + gold))
-            questHandler(questsDict[properTitle(val)], "Complete")
+            val = checkIn(
+                [i.lower() for i in completableQuests], "str",
+                (blue + "Please select a quest to complete. " + gold))
+            questHandler(questsDict[properTitle(val)], "Finish")
             return
     elif action == "exit":
         return
-    
+
 
 def interactionManager(kind, accessTileID):
     variable = interactionDict[accessTileID]
@@ -1492,20 +1533,29 @@ def tileManager(
                       " more turn(s).")
         statusEffects = tempDict
 
-    if variable.getLootTable(
-    ) != {}:  #Modifies the loot table's "Nothing" condition to make Perception have an impact on loot finding.
+    if variable.getLootTable() != {}:  #Modifies the loot table's "Nothing" condition to make Perception have an impact on loot finding.
         variable.setLootTableModifier(stats["Perception"])
         if variable.getLootTable()["Nothing"] < 0:
             variable.getLootTable()["Nothing"] = 0
-    if variable.getQuestFlavorText(questProgress) == "":
+    
+    if variable.getQuestFlavorText(questProgress) == "": #Replace usual flavor text with quest text, if at that stage.
         print(variable.getFlavorText())
     else:
         print(variable.getQuestFlavorText(questProgress))
 
-    if variable.getQuestEntryEncounter() and variable.isQuestEncounter(questProgress):
+    
+    
+    if variable.getQuestEntryEncounter() and variable.isQuestEncounter(
+            questProgress): #Test if there is a quest encounter at this tile and quest stage. If there is, it will proceed by playing out the encounter.
         monster, val = variable.getQuestEncounter(questProgress)
+        if type(monster) == list or type(monster) == tuple:
+            monster = choice(monster)
         monsterFight(monster, number)
         variable.questEncounterWin(val)
+    if type(variable.getEncounter()
+              ) == tuple and mobList[variable.getReferenceName()] > 0:
+        pickedMob = choice(variable.getEncounter())
+        monsterFight(pickedMob, number)
     if type(variable.getEncounter()) != bool and variable.getEncounter(
     ).getFaction() != "":  #In the case that the mob has a faction.
         try:  #It'll try and test if there's a mob here that's specified to be able to enter a battle upon entry.
@@ -1521,6 +1571,7 @@ def tileManager(
             print("Nothing is here to challenge you.")
         except AttributeError:
             print("Nothing is here to challenge you.")
+    
     else:
         try:
             if variable.encounterOnEnter(mobList[variable.getReferenceName()]):
@@ -1529,15 +1580,20 @@ def tileManager(
             print("Nothing is here to challenge you.")
         except AttributeError:
             print("Nothing is here to challenge you.")
-    
+
     manaRegen()
-    
-    fitDict = {key:value for key, value in questProgress.items() if value < len(questsDict[key].getQuestChainTuple())}
+
+    fitDict = {
+        key: value
+        for key, value in questProgress.items()
+        if value < len(questsDict[key].getQuestChainTuple())
+    }
     enterQuests = [
         questsDict[key] for key, value in fitDict.items()
-        if questsDict[key].getQuestChainTuple()[value].getType() == "Scout"
-        or questsDict[key].getQuestChainTuple()[value].getType() == "Go"
+        if questsDict[key].getQuestChainTuple()[value-1].getType() == "Scout"
+        or questsDict[key].getQuestChainTuple()[value-1].getType() == "Go"
     ]
+            
     for i in enterQuests:
         questHandler(i, "Check", tileNum=number)
     userInput = checkIn(tilesetLegals, "str", "What will you do? " +
@@ -1559,7 +1615,8 @@ def tileManager(
                 monster, val = variable.getQuestEncounter(questProgress)
                 monsterFight(monster, number)
                 variable.questEncounterWin(val)
-        if type(variable.getEncounter()) != bool and variable.getEncounter().getFaction() != "":
+        if type(variable.getEncounter()) != bool and variable.getEncounter(
+        ).getFaction() != "":
             replit.clear()
             if variable.getReferenceName() in mobList.keys():
                 if variable.encounterTest(
@@ -1604,7 +1661,7 @@ def tileManager(
             print(variable.getSearchText())
         else:
             print(variable.getQuestSearchText(questProgress))
-        
+
         if variable.getReferenceName() in tileItems and tileItems[
                 variable.getReferenceName()] == 0:
             print(red + "There's nothing left of interest here."
@@ -1733,7 +1790,7 @@ def questMenu():
         if value == 0:
             continue
         print(str(questsDict[key]))
-        print("----<[Objective]>----\n" +
+        print(blue + "----<[Objective]>----\n" +
               str(questsDict[key].getQuestChainTuple()[value - 1]) + "\n")
         ph = True
     if not ph:
@@ -1749,11 +1806,23 @@ def questHandler(quest: Quest, action: str, inp="", tileNum=0):
                 print(green + "-----{Received Quest: " + quest.getQuestName() +
                       "}-----")
                 print(quest.getIntroText())
+            else:
+                print(
+                    red +
+                    "Your standing is not high enough with this faction to accept this quest."
+                )
+        else:
+            questProgress[quest.getQuestName()] += 1
+            print(green + "-----{Received Quest: " + quest.getQuestName() +
+                  "}-----")
+            print(quest.getIntroText())
+
     elif action == "Check":
-        if questProgress[quest.getQuestName()] - 1 == -1 or questProgress[quest.getQuestName()] - 1 == len(quest.getQuestChainTuple()):
+        if questProgress[quest.getQuestName()] - 1 == -1 or questProgress[
+                quest.getQuestName()] - 1 >= len(quest.getQuestChainTuple()):
             return
-        questObj = quest.getQuestChainTuple()[questProgress[quest.getQuestName()] -
-                                              1]
+        questObj = quest.getQuestChainTuple()[
+            questProgress[quest.getQuestName()] - 1]
         if questObj.getType() == "Kill":
             if inp == questObj.getMob():
                 questObj.incrementAmount()
@@ -1775,7 +1844,7 @@ def questHandler(quest: Quest, action: str, inp="", tileNum=0):
                 print(f"{gold} [!] {green} Objective {str(questObj)} reached!")
                 questProgress[quest.getQuestName()] += 1
         elif questObj.getType() == "Clear":
-            if mobList[tilesDict[tileNum].getReferenceName()] == 0:
+            if tilesDict[tileNum].getAmountEncounters() <= 0:
                 print(f"{gold} [!] {green} Objective {str(questObj)} reached!")
                 questProgress[quest.getQuestName()] += 1
     elif action == "Finish":
@@ -1790,14 +1859,13 @@ def questHandler(quest: Quest, action: str, inp="", tileNum=0):
                 sub_stats["XP"] += value
                 levelUp()
             else:
-                print(IDDict[key].getColor() + IDDict[key].getItemName() + " +" + str(value))
+                print(IDDict[key].getColor() + IDDict[key].getItemName() +
+                      " +" + str(value))
                 try:
                     inventory[key] + value
                 except KeyError:
                     IDDict[key] + value
                     inventory[key] = IDDict[key]
-                    
-        
 
 
 def newGame():
@@ -1842,6 +1910,7 @@ def newGame():
             "Air": 0,
             "Light": 0,
             "Dark": 0,
+            "Mind": 0,
             "Wood": 0,
             "Metal": 0,
             "Sun": 0,
@@ -1855,6 +1924,7 @@ def newGame():
             "Air": 0,
             "Light": 0,
             "Dark": 0,
+            "Mind": 0,
             "Wood": 0,
             "Metal": 0,
             "Sun": 0,
@@ -1945,8 +2015,8 @@ def newGame():
 
 #Start
 def __main__():
-    global name, race, gender, tile, stats, sub_stats, equipped, inventory, questProgress, tileItems, mobList, reputation, turns, statusEffects, killedNPCs, skillLevels, tileRespawn
-    try:
+        global name, race, gender, tile, stats, sub_stats, equipped, inventory, questProgress, tileItems, mobList, reputation, turns, statusEffects, killedNPCs, skillLevels, tileRespawn
+    #try:
         username = os.environ["REPL_OWNER"]
         global record
         record = {}
@@ -1971,7 +2041,7 @@ def __main__():
                 sub_stats["Element Defense"] = dict(
                     sub_stats["Element Defense"])
                 tileItems = record["Tile Items"]
-                questProgress = record["Quest Progress"]
+                questProgress = dict(record["Quest Progress"])
                 reputation = record["Reputation"]
                 mobList = record["Mob List"]
                 skillLevels = record["Skill Levels"]
@@ -2011,9 +2081,10 @@ def __main__():
         else:
             print(orange + "You don't have a file on record.")
             newGame()
-    except AttributeError:
-        print(red + "You aren't logged into Repl.it! Saving and Loading won't work.")
-        newGame()
+    #except AttributeError:
+        #print(red +
+              #"You aren't logged into Repl.it! Saving and Loading won't work.")
+        #newGame()
 
 
 #yes, this code is this long. you made it to the end, good for you.
