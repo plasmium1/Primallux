@@ -62,4 +62,6 @@ Library interactible for managing buying into skill levels and handling item enc
 
 Mob defence move for more complex fights.
 
+Make a login thing since REPL_OWNER doesn't work in forcing .
+
 putting (FINISHED) at the end of things is hella satisfying lol

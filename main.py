@@ -12,7 +12,6 @@ from ansi.colour.fx import reset
 from quests import Quest, questsDict, moonreachQuests
 import sys
 from itertools import count
-
 black = "\u001b[30m"
 red = "\u001b[31m"
 green = rgb256(0x00, 0xff, 0x09)
@@ -58,6 +57,7 @@ defaultTileItems = {
 
 defaultMobList = {
     "Tile 9": 6,
+    "Tile 32": 4,
     "Dungeon Tile 1": 4,
     "Dungeon Tile 2": 3,
     "Dungeon Tile 3": 2,
@@ -116,48 +116,49 @@ def properTitle(inp):
 
 
 def save():
-    try:
-        username = os.environ["REPL_OWNER"]
-        db[username] = {}
-        record = db[username]
-        record["Saved"] = True
-        record["Turns"] = turns
-        record["Name"] = name
-        record["Race"] = race
-        record["Gender"] = gender
-        record["Tile"] = tile
-        record["Stats"] = stats
-        record["Sub Stats"] = sub_stats
-        record["Quest Progress"] = questProgress
-        record["Reputation"] = reputation
-        record["Tile Items"] = tileItems
-        record["Mob List"] = mobList
-        record["Killed NPCs"] = killedNPCs
-        record["Skill Levels"] = skillLevels
-        record["Tile Respawn"] = tileRespawn
-        enterDict = {}
-        for key, value in equipped.items():
-            if type(value) != str:
-                enterDict.update({key: value.dumpSaveRepresentation()})
-            else:
-                enterDict.update({key: value})
-        record["Equipped"] = enterDict
-        enterDict = {}
-        for key, value in inventory.items():
+    global username
+    record = {}
+    record["Saved"] = True
+    record["Turns"] = turns
+    record["Name"] = name
+    record["Race"] = race
+    record["Gender"] = gender
+    record["Tile"] = tile
+    record["Stats"] = stats
+    record["Sub Stats"] = sub_stats
+    record["Quest Progress"] = questProgress
+    record["Reputation"] = reputation
+    record["Tile Items"] = tileItems
+    record["Mob List"] = mobList
+    record["Killed NPCs"] = killedNPCs
+    record["Skill Levels"] = skillLevels
+    record["Tile Respawn"] = tileRespawn
+    enterDict = {}
+    for key, value in equipped.items():
+        if type(value) != str:
             enterDict.update({key: value.dumpSaveRepresentation()})
-        record["Inventory"] = enterDict
-        enterDict = {}
-        for key, value in statusEffects.items():
-            string = ""
-            placeholder = key.split(" ")
-            string += placeholder[0] + "|" + str(roman_to_int(placeholder[1]))
-            enterDict.update({string: value})
-        record["Status Effects"] = enterDict
-        print(green + "Data Saved!", reset)
+        else:
+            enterDict.update({key: value})
+    record["Equipped"] = enterDict
+    enterDict = {}
+    for key, value in inventory.items():
+        enterDict.update({key: value.dumpSaveRepresentation()})
+    record["Inventory"] = enterDict
+    enterDict = {}
+    for key, value in statusEffects.items():
+        string = ""
+        placeholder = key.split(" ")
+        string += placeholder[0] + "|" + str(roman_to_int(placeholder[1]))
+        enterDict.update({string: value})
+    record["Status Effects"] = enterDict
+    username = input(reset + "Enter your account username: " + gold)
+    pwd = input(reset + "Enter your account password: " + gold)
+    if db[username]["PWD"] != pwd:
+        print(red + "Password and username do not match.")
         return
-    except TypeError or ValueError:
-        print(red + "Create a Repl account to save data!", reset)
-        return
+    db[username]["Data"] = record
+    print(green + "Data Saved!", reset)
+    return
 """
 def stackTraceCounter(size=2):
     \"""Get stack size for caller's frame.
@@ -2014,16 +2015,52 @@ def newGame():
 
 
 #Start
+
+
+def registerAccount():
+    registry = checkIn(("yes", "no"), "str", "Register a new Primallux account? " + gold)
+    if registry == "yes":
+        usn = input(cyan + "Enter a username to register to. " + gold)
+        if usn in db.keys():
+            print(red + "This username is already in use.")
+            registerAccount()
+        else:
+            password = input(cyan + "Enter a password. " + gold)
+            confPassword = input(cyan + "Enter your password again. " + gold)
+            if password != confPassword:
+                print(red + "Passwords do not match.")
+                registerAccount()
+            else:
+                db[usn] = {"PWD":password,"Data":{}}
+                print(blue + "Primallux Account created!\n" + gold + "[!] " + green + "Remember to write down your username and password somewhere, or you won't be getting them back!")
+                input(blue + "Press [ENTER] to continue.")
+                replit.clear()
+                newGame()
+                return False, usn
+    elif registry == "no":
+        try:
+            usn = input(reset + "Username: " + gold)
+            pwd = input(reset + "Password: " + gold)
+            if db[usn]["PWD"] == pwd:
+                replit.clear()
+                return True, usn
+            else:
+                replit.clear()
+                print(red + "Password and Username do not match.")
+                registerAccount()
+        except KeyError:
+           replit.clear()
+           print(red + "This account is not registered.")
+           registerAccount()
+                
+
 def __main__():
-        global name, race, gender, tile, stats, sub_stats, equipped, inventory, questProgress, tileItems, mobList, reputation, turns, statusEffects, killedNPCs, skillLevels, tileRespawn
-    #try:
-        username = os.environ["REPL_OWNER"]
+    global name, race, gender, tile, stats, sub_stats, equipped, inventory, questProgress, tileItems, mobList, reputation, turns, statusEffects, killedNPCs, skillLevels, tileRespawn, username
+    
+    n, usn = registerAccount()
+    if n:
         global record
-        record = {}
-        if username not in db.keys():
-            print(red + "You do not have a saved file.")
-            newGame()
-        record = db[username]
+        record = db[usn]["Data"]
         if "Saved" in record.keys():
             print(blue + "You have a file on record.")
             userInput = checkIn(
@@ -2034,20 +2071,19 @@ def __main__():
                 name = record["Name"]
                 race = record["Race"]
                 gender = record["Gender"]
-                tile = record["Tile"]
-                stats = record["Stats"]
-                sub_stats = record["Sub Stats"]
+                tile = int(record["Tile"])
+                stats = dict(record["Stats"])
+                sub_stats = dict(record["Sub Stats"])
                 sub_stats["Element Damage"] = dict(sub_stats["Element Damage"])
-                sub_stats["Element Defense"] = dict(
-                    sub_stats["Element Defense"])
-                tileItems = record["Tile Items"]
+                sub_stats["Element Defense"] = dict(sub_stats["Element Defense"])
+                tileItems = dict(record["Tile Items"])
                 questProgress = dict(record["Quest Progress"])
-                reputation = record["Reputation"]
-                mobList = record["Mob List"]
-                skillLevels = record["Skill Levels"]
+                reputation = dict(record["Reputation"])
+                mobList = dict(record["Mob List"])
+                skillLevels = dict(record["Skill Levels"])
                 enterDict = {}
                 placeholder = record["Equipped"]
-                killedNPCs = record["Killed NPCs"]
+                killedNPCs = dict(record["Killed NPCs"])
                 for key, value in placeholder.items():
                     if value != "Empty":
                         loadList = value.split("|")
@@ -2071,20 +2107,22 @@ def __main__():
                     effectDict[loadList[0]].setLevel(loadList[1])
                     statusEffects.update({str(effectDict[loadList[0]]): value})
                 tileRespawn = dict(record["Tile Respawn"])
+                placeholder = {key:value for key, value in defaultTileRespawns.items() if key not in tileRespawn}
+                for key, value in placeholder.items():
+                    tileRespawn.update({key: value})
+                placeholder = {key:value for key, value in defaultTileItems.items() if key not in tileItems}
+                for key, value in placeholder.items():
+                    tileItems.update({key: value})
+                placeholder = {key:value for key, value in defaultMobList.items() if key not in tileItems}
+                for key, value in placeholder.items():
+                    mobList.update({key: value})
                 replit.clear()
                 print(green + "Data Loaded!")
-
+    
                 tileManager(tile)
             else:
                 db[username] = {}
                 newGame()
-        else:
-            print(orange + "You don't have a file on record.")
-            newGame()
-    #except AttributeError:
-        #print(red +
-              #"You aren't logged into Repl.it! Saving and Loading won't work.")
-        #newGame()
 
 
 #yes, this code is this long. you made it to the end, good for you.

@@ -11,6 +11,7 @@ green = rgb256(0x00, 0xff, 0x09)
 yellow = "\u001b[93m"
 orange = rgb256(0xff, 0x73, 0x00)
 gold = rgb256(0xe6, 0xcb, 0x02)
+silver = rgb256(0xbf, 0xbf, 0xbf)
 blue = "\u001b[34m"
 magenta = "\u001b[95m"
 cyan = rgb256(0x61, 0xff, 0xf4)
@@ -55,7 +56,7 @@ class Merchant:
     return self.sellDict[val]
   def printBuyItems(self):
     for key, value in self.buyDict.items():
-      print(str(identifierDict[key]) + blue + " Cost: " + gold + str(value))
+      print(str(identifierDict[key]) + blue + " Cost: " + silver + str(value))
   def printSellItems(self):
     myString = ""
     for key, value in self.sellDict.items():
@@ -205,13 +206,13 @@ dialogue2 = Dialogue(greeting={"Starter":"\"Anything you like?\"", "Turns > 50":
 
 merchant1 = Merchant("Peddler Jonas", "The Roasting Spit", "As you approach the stand, you smell an intensely enticing aroma, as the smell of cooked meat lathered in sauce caresses your nostrils.", "Moonreach Guild", {"Roast Bean Skewer":4, "Roast Mushroom Skewer":5}, discounts=1, dialogue=dialogue2)
 
-merchant2 = Merchant("Armorsmith Barro", "The Hammer and Plate", "A sign with a black-headed hammer over a silver-colored chestplate hangs over a medium-sized shop, where banging sounds from within.", "Moonreach Guild", {"Leather Tunic":24})
+merchant2 = Merchant("Smith Barro", "The Hammer and Plate", "A sign with a black-headed hammer over a silver-colored chestplate hangs over a medium-sized shop, where banging sounds from within.", "Moonreach Guild", {"Leather Tunic":24, "Leather Pants":22, "Skull Cap":20, "Studded Leather Tunic":40, "Studded Leather Pants":36})
 
 interact1 = Interactible("Dungeon Entrance", "You enter the cave, walking into the yawning, dirty, stone.", toTileID=-1)
 interact2 = Interactible("Dungeon Entrance", "You exit the cave, as your eyes slowly adjust to the light of the outside.", toTileID=9)
 interact3 = Interactible("Dialogue", "You approach another traveler entering the gates.", dialogue=dialogue1)
 interact4 = Interactible("Merchant", "You approach the stalls.", merchants=(merchant1, merchant2))
-interact4 = Interactible("Dialogue", "The demon raises his horned head, a chiseled face with a pair of darkened eyes looking at you in question, wordlessly asking for you to quickly go on and tell him what it was that troubled you so to enter the room.", )
+interact5 = Interactible("Dialogue", "The demon raises his horned head, a chiseled face with a pair of darkened eyes looking at you in question, wordlessly asking for you to quickly go on and tell him what it was that troubled you so to enter the room.", )
 crafting1 = Interactible("Crafting", "You enter the house radiating of strange fumes, as you smell odd smells that fill the air of this house of hissing and puffing magical machinery.", craftingType="Alchemy")
 resource1 = Interactible("Resource", "You attempt to capture one of the fish swimming in these waters.", tileID=7, lootTable={"Rolls":1, "Fresh Perch|Fishing|3":4, "Nothing":96}, gatherMod="Fishing")
 
@@ -460,9 +461,9 @@ tile25 = Tile((reset + "Past a statue of a lady with three eyes, lies a pair of 
 
 tile26 = Tile((reset + "An empty-ceiling room lies here, a single man dressed in loose robes standing in its center. He seems to be engrossed in a series of artful strikes against an invisible opponent."), ("The room opens into the clear sky above, sunny light shining down on fluffy clouds that float through the towers of the guild hall roof."), 26, {"West":24}) #Yin Nagata NPC, may challenge player.
 
-tile27 = Tile((reset + "Past a statue of a spear-wielding lady with a prideful smile, lies a spacious office, with a horned Demon and his assistant working together, poring over stacks upon stacks of parchment laid across their beautifully carved wooden table."), ("There lie a multitude of tapestries and varied trophies hanging on the walls and meticulously shelved, ever-more displaying this guild as that of hunters, hunters who hunted the big game of the wild."), 27, {"South":24}, tileNotFoundText=(gold + "You cannot find yourself walking through the walls of this office.")) #Guildmaster Chrys NPC
+tile27 = Tile((reset + "Past a statue of a spear-wielding lady with a prideful smile, lies a spacious office, with a horned Demon and his assistant working together, poring over stacks upon stacks of parchment laid across their beautifully carved wooden table."), ("There lie a multitude of tapestries and varied trophies hanging on the walls and meticulously shelved, ever-more displaying this guild as that of hunters, hunters who hunted the big game of the wild."), 27, {"South":24}, tileNotFoundText=(gold + "You cannot find yourself walking through the walls of this office."), interactible=interact5) #Guildmaster Chrys NPC
 
-tile28 = Tile((reset + "A bend in the road is here, where one end stretches to the north, and another, into the brush of the east."), ("Being further from civilization, this segment of the road is significantly more overgrown with weeds than that of the north."), 28, {"North":8, "East":9, "West":34}, questFlavorText={"Bandits|1":(reset + "You come upon a wrecked wagon, with its drawing oxen slain with arrows in their eyes, and a wagon wheel crushed against the dirt."), "Bandits|2":(reset + "You come upon a wrecked wagon, with its drawing oxen slain with arrows in their eyes, and a wagon wheel crushed against the dirt.")}, questSearchText={"Bandits|2":(reset + "It's clear what happened here. The caravan was ambushed, with human tracks of at least three men that lead off into the west.")})
+tile28 = Tile((reset + "The road, stretching far from the north to the south, carved by the passage of foot and wagon, over many years of traveling."), ("Being further from civilization, this segment of the road is significantly more overgrown with weeds than that of the north."), 28, {"North":8, "South":36, "East":9, "West":34}, questFlavorText={"Bandits|1":(reset + "You come upon a wrecked wagon, with its drawing oxen slain with arrows in their eyes, and a wagon wheel crushed against the dirt."), "Bandits|2":(reset + "You come upon a wrecked wagon, with its drawing oxen slain with arrows in their eyes, and a wagon wheel crushed against the dirt.")}, questSearchText={"Bandits|2":(reset + "It's clear what happened here. The caravan was ambushed, with human tracks of at least three men that lead off into the west.")})
 
 tile29 = Tile((reset + "Water runs over smoothened river stones, clear water reflecting the light of day in your eyes, as moss covered stones wall its sides in verdant green."), ("You spot a wooden bridge going over the stream, crossing the water and crafted of logs tied by water-soaked rope."), 29, {"South":2}) #Tilenotfound should be being blocked by fortress walls.
 
@@ -476,9 +477,9 @@ tile33 = Tile((reset + "The dirt rises into a hill to the west, as more uneven g
 
 tile34 = Tile((reset + "Deeper into the forest, you spot the branches close together, as pine fronds intersect each other, each seeking for, and turning the sun's rays into thin points of light on the dirt."), ("Life seems to be flourishing, in the places shaded by tree leaves, as small plants with purple sickle-shaped leaves growing amongs knotted roots."), 34, {"South":35, "East":28}, questFlavorText={"Bandits|2":(reset + "Bloodied tracks lead down to the south. You feel that your quarry is close, perhaps even watching you, already."), "Bandits|3":(reset + "Bloodied tracks lead down to the south. You feel that your quarry is close, perhaps even watching you, already.")}, questSearchText={"Bandits|3":(reset + "An acrid smell fills the air, the smell of overcooked, charred, meat.")})
 
-tile35 = Tile((reset + "A small clearing lies here, where there could have once been a great tree stretching into the skies, reduced to a moss-grown table of circle-marked wood."), ("Small yellow flowers dot the green carpeting over the ground, as the clear blue skies show above in the sky, opening a window of sunlight into the clearing guarded by brown-clad sentries."), 35, {"North":34}, questFlavorText={"Bandits|3":(reset + "You enter a small clearing in the forest, where a bandit camp lies, tents placed in the forest, the remnants of a burnt-out campfire, and the laughing of cruel men.")}, questEncounters={"Bandits|3":[[mobDict["Forest Bandit 1"], mobDict["Forest Bandit 2"]], 8], "Bandits|4":mobDict["Bandit Leader Toderick"]}, questEntryEncounter=True)
+tile35 = Tile((reset + "A small clearing lies here, where there could have once been a great tree stretching into the skies, reduced to a moss-grown table of circle-marked wood."), ("Small yellow flowers dot the green carpeting over the ground, as the clear blue skies show above in the sky, opening a window of sunlight into the clearing guarded by brown-clad sentries."), 35, {"North":34, "East":36}, questFlavorText={"Bandits|3":(reset + "You enter a small clearing in the forest, where a bandit camp lies, tents placed in the forest, the remnants of a burnt-out campfire, and the laughing of cruel men.")}, questEncounters={"Bandits|3":[[mobDict["Forest Bandit 1"], mobDict["Forest Bandit 2"]], 8], "Bandits|4":mobDict["Bandit Leader Toderick"]}, questEntryEncounter=True)
 
-#tile36
+tile36 = Tile((reset + "The road cuts a line through the forest, as if defying the wild sanctity of nature with its presence."), (reset + "You see twisted boughs, elder bark, and a sense of permanence, and beings born of a long-past era, around you. These knotted trees seem to be thick enough for you to climb."), 36, {"North":28, "West":35})
 
 
 
@@ -493,6 +494,6 @@ dungeonTile4 = Tile((reset + "You are in a large cavern, with a steep drop away 
 
 dungeonTile5 = Tile((reset + "Most of the cave's inhabitants appear to be quite shy of your intrusion, making themselves scarce whenever you come near."), ("A patch of glowing mushrooms grows by the side of a pool of water, filled by the steady drip of water dropping from the ceiling."), -5, {"North":-4}, encounter=mobDict["Cave Crawler"], encounterChance=8, findNoEncounterText="You hear the lumbering of large creatures in the darkness. Who knew that things in a cave like this could grow to such sizes?", noMoreMobsText="It's a serene environment indeed, as the rhythmic plip, plop, of water droplets sounds in your ears, a rhythmic, slow, noise.")
 
-tilesDict = {1:tile1, 2:tile2, 3:tile3, 4:tile4, 5:tile5, 6:tile6, 7:tile7, 8:tile8, 9:tile9, 10:tile10, 11:tile11, 12:tile12, 13:tile13, 14:tile14, 15:tile15, 16:tile16, 17:tile17, 18:tile18, 19:tile19, 20:tile20, 21:tile21, 22:tile22, 23:tile23, 24:tile24, 25:tile25, 26:tile26, 27:tile27, 28:tile28, 29:tile29, 30:tile30, 31:tile31, 32:tile32, 33:tile33, 34:tile34, 35:tile35, -1:dungeonTile1, -2:dungeonTile2, -3:dungeonTile3, -4:dungeonTile4, -5:dungeonTile5}
+tilesDict = {1:tile1, 2:tile2, 3:tile3, 4:tile4, 5:tile5, 6:tile6, 7:tile7, 8:tile8, 9:tile9, 10:tile10, 11:tile11, 12:tile12, 13:tile13, 14:tile14, 15:tile15, 16:tile16, 17:tile17, 18:tile18, 19:tile19, 20:tile20, 21:tile21, 22:tile22, 23:tile23, 24:tile24, 25:tile25, 26:tile26, 27:tile27, 28:tile28, 29:tile29, 30:tile30, 31:tile31, 32:tile32, 33:tile33, 34:tile34, 35:tile35, 36:tile36, -1:dungeonTile1, -2:dungeonTile2, -3:dungeonTile3, -4:dungeonTile4, -5:dungeonTile5}
 
-interactionDict = {9:interact1, -1:interact2, 7:resource1, 10:interact3, 12:interact4, 16:crafting1, 21:moonreachQuestHall}
+interactionDict = {9:interact1, -1:interact2, 7:resource1, 10:interact3, 12:interact4, 16:crafting1, 21:moonreachQuestHall, 27:interact5}
