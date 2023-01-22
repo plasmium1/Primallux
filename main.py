@@ -12,6 +12,7 @@ from ansi.colour.fx import reset
 from quests import Quest, questsDict, moonreachQuests
 import sys
 from itertools import count
+
 black = "\u001b[30m"
 red = "\u001b[31m"
 green = rgb256(0x00, 0xff, 0x09)
@@ -28,7 +29,6 @@ white = "\u001b[37m"
 bold = "\u001b[1m"
 underline = "\u001b[4m"
 italic = "\u001b[3m"
-
 tilesetLegals = (
     "h", "help", "look", "l", "search", "north", "south", "east", "west", "n",
     "s", "e", "w", "wander", "inv", "inventory", "magic", "m", "int",
@@ -40,6 +40,7 @@ defaultTileRespawns = {
     "Tile 3": 210,
     "Tile 9": 210,
     "Tile 32": 300,
+    "Tile 36": 210,
     "Dungeon Tile 1": 205,
     "Dungeon Tile 2": 200,
     "Dungeon Tile 3": 255,
@@ -52,6 +53,7 @@ defaultTileItems = {
     "Tile 1": 4,
     "Tile 3": 6,
     "Tile 32": 5,
+    "Tile 36": 4,
     "Dungeon Tile 2": 3
 }  #Keeps track of how many items there are for each tile.
 
@@ -118,7 +120,6 @@ def properTitle(inp):
 def save():
     global username
     record = {}
-    record["Saved"] = True
     record["Turns"] = turns
     record["Name"] = name
     record["Race"] = race
@@ -376,6 +377,23 @@ def checkIn(
             except:
                 inputVal = int(input(message))
     return inputVal
+
+
+def showTilePossibleInputs(tileID):
+    thisTile = tilesDict[tileID]
+    print(green + "Valid inputs: ")
+    possibleInputs = "save, help, look, inventory, stats, skills, quests, wander, "
+    if thisTile.getNearbyTiles() != {}:
+        for key in thisTile.getNearbyTiles():
+            possibleInputs += key.lower() + ", "
+    if thisTile.getUpTile() != 0:
+        possibleInputs += "up" + ", "
+    if thisTile.getDownTile() != 0:
+        possibleInputs += "down" + ", "
+    if thisTile.getInteractible() != False:
+        possibleInputs += "interact" + ", "
+    possibleInputs = possibleInputs[:-2]
+    print(reset + possibleInputs)
 
 
 def statsCheck():  #In-game stat checker!
@@ -867,6 +885,8 @@ def monsterFight(mob, tile):
     while True:
         manaRegen()
         print(reset + mob.getDuringText())
+        print(green + "Valid Inputs:" + "\n")
+        print(reset + "attack, fight, run, consumable, talk, defend, pacify")
         userInput = checkIn(
             ("attack", "fight", "a", "f", "run", "flee", "consumable", "c",
              "r", "talk", "t", "defend", "d", "pacify", "p"), "str",
@@ -1031,7 +1051,7 @@ def monsterFight(mob, tile):
     }
     killQuests = [
         questsDict[key] for key, value in fitDict.items()
-        if questsDict[key].getQuestChainTuple()[value-1].getType() == "Kill"
+        if questsDict[key].getQuestChainTuple()[value - 1].getType() == "Kill"
     ]
     for i in killQuests:
         questHandler(i, "Check", mob, tile)
@@ -1274,8 +1294,9 @@ def sellManager(variable):
 def craftingHandler(kind: str, recipes: tuple) -> None:
     print({
         "Alchemy": (green + "-----{ Alchemist's Cauldron }-----"),
+        "Runation": (purple + "-----{Enchanter's Inscription Circle}-----"),
         "Smithing": (orange + "-----{Blacksmith's Forge}-----"),
-        "Runation": (purple + "-----{Enchanter's Inscription Circle}-----")
+		"Tailoring": (light_purple + "-----{Tailor's Loom}-----")
     }[kind])  #Print decoration separator
 
     for i in recipes:
@@ -1452,7 +1473,7 @@ def interactionManager(kind, accessTileID):
     #elif kind == "Merchant|Crafting"
     elif kind == "Dungeon Entrance":  #In the case of it being a dungeon entrance, it directs you to the tile-manager for the tile on the other side of the entrance.
         tileManager(variable.getToTileID())
-    elif kind == "Resource":  #Planned to make it so when on interaction, it runs some lil function to test if you get the resource or not, and upon success, adds it to the inventory.
+    elif kind == "Resource":  #Runs some lil function to test if you get the resource or not, and upon success, adds it to the inventory.
         resourceList = variable.getLoot(
             round(stats["Strength"] * 0.05 + stats["Perception"] * 0.05) +
             skillLevels[variable.getGatherMod()])
@@ -1534,27 +1555,29 @@ def tileManager(
                       " more turn(s).")
         statusEffects = tempDict
 
-    if variable.getLootTable() != {}:  #Modifies the loot table's "Nothing" condition to make Perception have an impact on loot finding.
+    if variable.getLootTable(
+    ) != {}:  #Modifies the loot table's "Nothing" condition to make Perception have an impact on loot finding.
         variable.setLootTableModifier(stats["Perception"])
         if variable.getLootTable()["Nothing"] < 0:
             variable.getLootTable()["Nothing"] = 0
-    
-    if variable.getQuestFlavorText(questProgress) == "": #Replace usual flavor text with quest text, if at that stage.
+
+    if variable.getQuestFlavorText(
+            questProgress
+    ) == "":  #Replace usual flavor text with quest text, if at that stage.
         print(variable.getFlavorText())
     else:
         print(variable.getQuestFlavorText(questProgress))
 
-    
-    
     if variable.getQuestEntryEncounter() and variable.isQuestEncounter(
-            questProgress): #Test if there is a quest encounter at this tile and quest stage. If there is, it will proceed by playing out the encounter.
+            questProgress
+    ):  #Test if there is a quest encounter at this tile and quest stage. If there is, it will proceed by playing out the encounter.
         monster, val = variable.getQuestEncounter(questProgress)
         if type(monster) == list or type(monster) == tuple:
             monster = choice(monster)
         monsterFight(monster, number)
         variable.questEncounterWin(val)
     if type(variable.getEncounter()
-              ) == tuple and mobList[variable.getReferenceName()] > 0:
+            ) == tuple and mobList[variable.getReferenceName()] > 0:
         pickedMob = choice(variable.getEncounter())
         monsterFight(pickedMob, number)
     if type(variable.getEncounter()) != bool and variable.getEncounter(
@@ -1572,7 +1595,7 @@ def tileManager(
             print("Nothing is here to challenge you.")
         except AttributeError:
             print("Nothing is here to challenge you.")
-    
+
     else:
         try:
             if variable.encounterOnEnter(mobList[variable.getReferenceName()]):
@@ -1591,12 +1614,13 @@ def tileManager(
     }
     enterQuests = [
         questsDict[key] for key, value in fitDict.items()
-        if questsDict[key].getQuestChainTuple()[value-1].getType() == "Scout"
-        or questsDict[key].getQuestChainTuple()[value-1].getType() == "Go"
+        if questsDict[key].getQuestChainTuple()[value - 1].getType() == "Scout"
+        or questsDict[key].getQuestChainTuple()[value - 1].getType() == "Go"
     ]
-            
+
     for i in enterQuests:
         questHandler(i, "Check", tileNum=number)
+    showTilePossibleInputs(number)
     userInput = checkIn(tilesetLegals, "str", "What will you do? " +
                         gold)  #User inputs for the tile itself.
     if userInput == "wander":  #Selects a random direction to go in, and sends you in that direction.
@@ -1985,6 +2009,7 @@ def newGame():
         "Smithing": 0,
         "Jeweling": 0,
         "Runation": 0,
+        "Tailoring": 0,
         "Tinkering": 0
     }  #Skills for resource gathering and crafting.
 
@@ -2018,50 +2043,59 @@ def newGame():
 
 
 def registerAccount():
-    registry = checkIn(("yes", "no"), "str", "Register a new Primallux account? " + gold)
-    if registry == "yes":
-        usn = input(cyan + "Enter a username to register to. " + gold)
-        if usn in db.keys():
-            print(red + "This username is already in use.")
-            registerAccount()
-        else:
-            password = input(cyan + "Enter a password. " + gold)
-            confPassword = input(cyan + "Enter your password again. " + gold)
-            if password != confPassword:
-                print(red + "Passwords do not match.")
+    registry = checkIn(("yes", "no"), "str",
+                       "Register a new Primallux account? " + gold)
+    try:
+        if registry == "yes":
+            usn = input(cyan + "Enter a username to register to. " + gold)
+            if usn in db.keys():
+                print(red + "This username is already in use.")
                 registerAccount()
             else:
-                db[usn] = {"PWD":password,"Data":{}}
-                print(blue + "Primallux Account created!\n" + gold + "[!] " + green + "Remember to write down your username and password somewhere, or you won't be getting them back!")
-                input(blue + "Press [ENTER] to continue.")
+                password = input(cyan + "Enter a password. " + gold)
+                confPassword = input(cyan + "Enter your password again. " +
+                                     gold)
+                if password != confPassword:
+                    print(red + "Passwords do not match.")
+                    registerAccount()
+                else:
+                    db[usn] = {"PWD": password, "Data": {}}
+                    print(
+                        blue + "Primallux Account created!\n" + gold + "[!] " +
+                        green +
+                        "Remember to write down your username and password somewhere, or you won't be getting them back!"
+                    )
+                    input(blue + "Press [ENTER] to continue.")
+                    replit.clear()
+                    newGame()
+                    return False, usn
+        elif registry == "no":
+            try:
+                usn = input(reset + "Username: " + gold)
+                pwd = input(reset + "Password: " + gold)
+                if db[usn]["PWD"] == pwd:
+                    replit.clear()
+                    return True, usn
+                else:
+                    replit.clear()
+                    print(red + "Password and Username do not match.")
+                    registerAccount()
+            except KeyError:
                 replit.clear()
-                newGame()
-                return False, usn
-    elif registry == "no":
-        try:
-            usn = input(reset + "Username: " + gold)
-            pwd = input(reset + "Password: " + gold)
-            if db[usn]["PWD"] == pwd:
-                replit.clear()
-                return True, usn
-            else:
-                replit.clear()
-                print(red + "Password and Username do not match.")
+                print(red + "This account is not registered.")
                 registerAccount()
-        except KeyError:
-           replit.clear()
-           print(red + "This account is not registered.")
-           registerAccount()
-                
+    except AttributeError as e:
+        print(e)
+
 
 def __main__():
     global name, race, gender, tile, stats, sub_stats, equipped, inventory, questProgress, tileItems, mobList, reputation, turns, statusEffects, killedNPCs, skillLevels, tileRespawn, username
-    
+
     n, usn = registerAccount()
     if n:
         global record
         record = db[usn]["Data"]
-        if "Saved" in record.keys():
+        if len(record) > 0:
             print(blue + "You have a file on record.")
             userInput = checkIn(
                 ("yes", "no"), "str",
@@ -2075,7 +2109,8 @@ def __main__():
                 stats = dict(record["Stats"])
                 sub_stats = dict(record["Sub Stats"])
                 sub_stats["Element Damage"] = dict(sub_stats["Element Damage"])
-                sub_stats["Element Defense"] = dict(sub_stats["Element Defense"])
+                sub_stats["Element Defense"] = dict(
+                    sub_stats["Element Defense"])
                 tileItems = dict(record["Tile Items"])
                 questProgress = dict(record["Quest Progress"])
                 reputation = dict(record["Reputation"])
@@ -2107,22 +2142,36 @@ def __main__():
                     effectDict[loadList[0]].setLevel(loadList[1])
                     statusEffects.update({str(effectDict[loadList[0]]): value})
                 tileRespawn = dict(record["Tile Respawn"])
-                placeholder = {key:value for key, value in defaultTileRespawns.items() if key not in tileRespawn}
+                placeholder = {
+                    key: value
+                    for key, value in defaultTileRespawns.items()
+                    if key not in tileRespawn
+                }
                 for key, value in placeholder.items():
                     tileRespawn.update({key: value})
-                placeholder = {key:value for key, value in defaultTileItems.items() if key not in tileItems}
+                placeholder = {
+                    key: value
+                    for key, value in defaultTileItems.items()
+                    if key not in tileItems
+                }
                 for key, value in placeholder.items():
                     tileItems.update({key: value})
-                placeholder = {key:value for key, value in defaultMobList.items() if key not in tileItems}
+                placeholder = {
+                    key: value
+                    for key, value in defaultMobList.items()
+                    if key not in tileItems
+                }
                 for key, value in placeholder.items():
                     mobList.update({key: value})
                 replit.clear()
                 print(green + "Data Loaded!")
-    
+
                 tileManager(tile)
             else:
-                db[username] = {}
+                db[usn]["Data"] = {}
                 newGame()
+        else:
+            newGame()
 
 
 #yes, this code is this long. you made it to the end, good for you.

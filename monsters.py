@@ -200,7 +200,12 @@ hungryWolf = Mob("Hungry Wolf", 48, 3, 8, 1, 0, 4, "A ragged wolf appears, drool
  1, convinceThreshold=80, lootTable={"Rolls":1, "Wolf Fang":15, "Nothing":70, "Wolf Pelt":15}, faction="Nature", factionRepDecrease=5)
 
 forestWolf = Mob("Forest Wolf", 64, 5, 11, 3, 0, 6, "A furred wolf appears from the trees, its coat of varying shades of brown, that blends into the rest of the landscape.", "A rumbling growl emanates from the wolf's throat, the threat clear in the air.", "The wolf makes a whining noise, as it falls to the ground, blood leaking away from its body, as it expires.", "The wolf exposes its canines, showing you its teeth.", "The wolf sniffs your hand in curiosity, before leaving you alone, disappearing into the trees.", 4, 5, convinceThreshold=60, lootTable={"Rolls":1, "Wolf Fang":20, "Fine Wolf Pelt":5, "Wolf Pelt":10, "Nothing":65}, faction="Nature", factionRepDecrease=5, mobFleeHP=12, fleeText="The wolf feels its wounds, and the pain that suffuses its body. It runs, loping away and out of sight, escaping into the forest to lick its wounds.")
-#direWolf = Mob("Dire Wolf", 55)
+
+#direWolf = Mob("Dire Wolf", 75)
+
+# silvermane = Mob()
+
+forestFox = Mob("Forest Fox", 36, 6, 9, 36, 0, 7, "A small fox, furred in light browns that liken it to the color of dried pine needles, approaches you.", "The fox circles about, its beady eyes flicking up at your much larger form, as its tongue darts in and out to lick at its mouth.", "The fox falls, succumbing to its wounds, as it frantically paws at the ground in an attempt to escape, before falling still.", "The fox yips harshly, as it quickly dashes back a distance from you.", "The fox settles, its eyes no longer flicking everywhere about you and your surroundings, calming, before it leaves into the forest.", 4, 5, convinceThreshold=55, lootTable={"Rolls":1, "Fox Pelt":10, "Fox Tail":5, "Nothing":85}, faction="Nature", factionRepDecrease=5, mobFleeHP=15, fleeText="The fox's jumpiness reaches a new high, as it whimpers, and dashes away from the scene.")
 
 koboldScout = Mob("Kobold Scout", 70, 10, 18, 18, 4, 10, "A diminutive lizardine biped meets you, holding a pair of daggers in its hands. It hisses at you in Kobold. Too bad you don't know what it's saying.", "The Kobold looks nervously at you, and at the passage behind it.", "The Kobold screeches in pain. It expires slowly, leaving the cowardly lizard as a corpse on the ground.", "The Kobold waves its daggers, which shine dully in the light. It's got a certain shake in its legs.", "The kobold hisses, and seeing that you don't present much danger to it, it runs off.", 8, 4, convinceThreshold=100, lootTable={"Rolls":1, "Iron Dagger":28, "Kobold Leather Tunic":30, "Kobold Eye":15, "Nothing":27}, faction="Draconic Accord", factionRepDecrease=10, killRepBonus={"Goblin Consortium":-10, "Mountain Jarldom":5}, mobFleeHP=15, fleeText="The kobold sees that you're too powerful, and itself, being too hurt to keep fighting. It runs away in fear.")
 
@@ -220,6 +225,7 @@ banditLeaderToderick = Mob("Bandit Leader Toderick", 380, 18, 32, 30, 18, 35, "A
 
 mobDict = {"Hungry Wolf":hungryWolf,
            "Forest Wolf":forestWolf,
+		   "Forest Fox":forestFox,
            "Kobold Scout":koboldScout,
            "Cave Shrieker":caveShrieker,
            "Cave Crawler":caveCrawler,

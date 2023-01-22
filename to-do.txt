@@ -1,3 +1,5 @@
+plasmium's To-Do list!
+
 Finish magic system
 
 Add more tiles
@@ -56,7 +58,7 @@ Creating an alternate Personal version meant to be downloaded and not quite run 
 
 Quests (Actual quests not finished, but system works.)
 
-Quest hall interactible!!! (Added, untested)
+Quest hall interactible!!! (Added, tested for single quest, untested for random selection on multiple)
 
 Library interactible for managing buying into skill levels and handling item enchantment.
 

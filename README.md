@@ -47,6 +47,7 @@ __In-fight Controls__
 
 *Critical Hits* - By a small chance, (Your critical hit modifier), you have a chance of performing a critical hit upon either attacking or defending.
 
+
 -------------------------
 | More information: |
 -------------------------

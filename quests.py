@@ -135,7 +135,11 @@ objective2 = Objective("Scout", 2, "Bandit Camp", location=(34,))
 objective3 = Objective("Clear", 3, "Bandit Camp", location=(35,))
 objective4 = Objective("Kill", 4, "Bandit Camp", location=(35,), mob=mobDict["Bandit Leader Toderick"])
 
+
+
 quest1 = Quest("Bandits", "A group of bandits have been ambushing trade caravans coming to the Moonreach Fortress for a while now. And the Guild wants you to find them and clear them out.", 4, "To begin, the Guild wishes for you to investigate the disappearance of a traveling merchant who was coming to the fortress.", (objective1, objective2, objective3, objective4), reward={"Ghost Silver":50, "XP":30})
+
+# quest2 = Quest("")
 
 questsDict = {"Bandits":quest1}
 moonreachQuests = ("Bandits",)

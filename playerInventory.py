@@ -341,6 +341,8 @@ woolenHat = EquipmentItem("Head", "Woolen Hat", 0, {
     "Perception": 1
 })
 
+foxPelt = InvItem("Misc", "Fox Pelt", 0)
+foxTail = InvItem("Misc", "Fox Tail", 0)
 wolfPelt = InvItem("Misc", "Wolf Pelt", 0)
 koboldEye = InvItem("Misc", "Kobold Eye", 0)
 quartzStone = InvItem("Misc", "Quartz Stone", 0)
@@ -351,12 +353,13 @@ redBannerToken = InvItem("Misc", "Red Banner Token", 0)
 
 mushroom = ConsumableItem("Mushroom", 0, {"Current HP": 15})
 freshPerch = ConsumableItem("Fresh Perch", 0, {"Current HP": 20})
-roastBeanSkewer = ConsumableItem("Roast Bean Skewer",
-                                 0, {"Current HP": 15},
-                                 effects=("Hearty Meal|1", ))
 roastMushroomSkewer = ConsumableItem("Roast Mushroom Skewer",
-                                     0, {"Current HP": 22},
-                                     effects={"Hearty Meal|1"})
+                                 0, {"Current HP": 22},
+                                 effects=("Hearty Meal|1", ))
+roastMeatSkewer = ConsumableItem("Roast Meat Skewer",
+                                     0, {"Current HP": 48},
+                                     effects=("Hearty Meal|1", ))
+
 insectFlesh = ConsumableItem("Insect Flesh",
                              0, {"Current HP": 10},
                              effects=("Food Poisoning|1", ))
@@ -367,6 +370,8 @@ potionOfSight = ConsumableItem("Potion of Sight",
 identifierDict = {
     "Bandit Cleaver": banditCleaver,
     "Fresh Perch": freshPerch,
+	"Fox Pelt": foxPelt,
+	"Fox Tail": foxTail,
     "Fungus Ichor": fungusIchor,
     "Heavy Chitin Plate": heavyChitinPlate,
     "Insect Flesh": insectFlesh,
@@ -385,7 +390,7 @@ identifierDict = {
     "Quartz Stone": quartzStone,
     "Red Banner Token": redBannerToken,
     "Reinforced Leather Tunic":reinforcedLeatherTunic,
-    "Roast Bean Skewer": roastBeanSkewer,
+    "Roast Meat Skewer": roastMeatSkewer,
     "Roast Mushroom Skewer": roastMushroomSkewer,
     "Skull Cap": skullCap,
     "Studded Leather Tunic": studdedLeatherTunic,
