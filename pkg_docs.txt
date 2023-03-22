@@ -9,13 +9,14 @@ Dialogue system <- Finished!
  --- NOTE: ALWAYS put the above statement AFTER the & statement.
  -- The # symbol marks that this statement can only be said if the player has toggled the NPC's "metBefore" argument.
  -- The ` symbol marks that this statement can only be said if the player has not toggled the NPC's "metBefore" argument.
+ --- Think of the metBefore argument as being "friends" with that NPC.
  -- The $ symbol marks that the statement makes the NPC give you a Quest or an Item as specified afterward or just about anything.
  --- This statement MUST come before the "=" statement.
  -- The * symbol marks that the statement does not advance you in a dialogue round.
  -- The @ symbol brings the player back to round 1.
- -- The expression after = marks that what is between is a quest argument. "(questName)/(Stage #)/[Toggle Talk quest] or [Give NPC item]/itemName/ (item amount optional)"
+ -- The expression after = marks that what is between the marks is a quest argument. "(questName)/(Stage #)/[Toggle Talk quest] or [Give NPC item]/itemName/ (item amount optional, default is 1)"
  --- Recommended to put the "=" expression after a selected dialogue message.
- --- Note: For readability, try putting a g)Goodbye|&Round 1 marker at the end of each dialogueRounds.
+ --- Note: For readability, try putting a g)Goodbye|&Round n (where n is any round number in use) marker at the end of each dialogueRounds.
 
 Quests:
  -- QuestChainTuple is a tuple of Objective objects. Stage is the index of the objective in the tuple minus 1.

@@ -9,7 +9,7 @@ from random import randint, choices, choice, sample
 from ansi.colour import fg
 from ansi.colour.rgb import rgb256
 from ansi.colour.fx import reset
-from quests import Quest, questsDict, moonreachQuests
+from quests import Quest, questsDict, moonreachQuests, defaultQuests, defaultRep
 import sys
 from itertools import count
 
@@ -66,6 +66,7 @@ defaultMobList = {
     "Dungeon Tile 4": 3,
     "Dungeon Tile 5": 3
 }  #Assigns a limit on the amount of monsters in a specific tile.
+
 
 #Declare and initialize items based on IDs
 IDDict = identifierDict
@@ -131,6 +132,7 @@ def save():
     record["Reputation"] = reputation
     record["Tile Items"] = tileItems
     record["Mob List"] = mobList
+    record["Met NPCs"] = metNPCs
     record["Killed NPCs"] = killedNPCs
     record["Skill Levels"] = skillLevels
     record["Tile Respawn"] = tileRespawn
@@ -382,7 +384,7 @@ def checkIn(
 def showTilePossibleInputs(tileID):
     thisTile = tilesDict[tileID]
     print(green + "Valid inputs: ")
-    possibleInputs = "save, help, look, inventory, stats, skills, quests, wander, "
+    possibleInputs = "help, look, inventory, stats, skills, quests, wander, "
     if thisTile.getNearbyTiles() != {}:
         for key in thisTile.getNearbyTiles():
             possibleInputs += key.lower() + ", "
@@ -1062,111 +1064,130 @@ def monsterFight(mob, tile):
 
 
 def dialogueManager(interaction: Interactible):
-    print(interaction.getDialogue().getGreeting(turns, questProgress))
-    dialogueRound = 1
-    previousChoice = ""
-    tempDictionary = interaction.getDialogue().getFurtherDialogueDict()
+	print(interaction.getDialogue().getGreeting(turns, questProgress))
+	dialogueRound = 1
+	previousChoice = ""
+	tempDictionary = interaction.getDialogue().getFurtherDialogueDict()
 
-    while True:
-        listLegals = []
-        for key in tempDictionary.keys():
-            tempKey = "".join(
-                list(filter(lambda a: a not in ("@", "*", "#", "`"), key)))
-            if "#" in key and not interaction.getDialogue().getMetBefore():
-                continue
-            if "`" in key and interaction.getDialogue().getMetBefore():
-                continue
-            if "=" in key:
-                arg = tempKey.split("=")[1].split("/")
-                tempKey = tempKey.split("=")[0]
-                if questProgress[arg[0]] == int(arg[1]):
-                    if arg[2] == "Toggle":
-                        print(
-                            f"{gold} [!] {green} Objective {str(questsDict[arg[0]].getQuestChainTuple()[questProgress[questsDict[arg[0]].getQuestName()]-1])} reached!"
-                        )
-                        questProgress[questsDict[arg[0]].getQuestName()] += 1
-                    elif arg[2] == "Give":
-                        amount = 1
-                        if len(arg) == 5:
-                            amount = int(arg[4])
-                        if identifierDict[arg[3]].getItemAmount() < amount:
-                            print(red +
-                                  "You do not have the required amount of " +
-                                  arg[3] + ".")
-                            break
-                        print(questsDict[arg[0]].getQuestChainTuple()[
-                            questProgress[questsDict[arg[0]].getQuestName()] -
-                            1]).getNPCDialogue()
-                        identifierDict[arg[3]].getItemAmount() - amount
+	while True:
+		listLegals = []
+		for key in tempDictionary.keys():
+			tempKey = "".join(
+				list(filter(lambda a: a not in ("@", "*", "#", "`", "\\"), key)))
+			if "#" in key and not interaction.getDialogue().getMetBefore():
+				continue
+			if "`" in key and interaction.getDialogue().getMetBefore():
+				continue
+			if "=" in key:
+				arg = tempKey.split("=")[1].split("/")
+				tempKey = tempKey.split("=")[0]
+				if questProgress[arg[0]] == int(arg[1]):
+					if arg[2] == "Toggle":
+						print(
+							f"{gold} [!] {green} Objective {str(questsDict[arg[0]].getQuestChainTuple()[questProgress[questsDict[arg[0]].getQuestName()]-1])} reached!"
+						)
+						questProgress[questsDict[arg[0]].getQuestName()] += 1
+					elif arg[2] == "Give":
+						amount = 1
+						if len(arg) == 5:
+							amount = int(arg[4])
+						if identifierDict[arg[3]].getItemAmount() < amount:
+							print(red +
+								"You do not have the required amount of " +
+								arg[3] + ".")
+							break
+						print(questsDict[arg[0]].getQuestChainTuple()[
+							questProgress[questsDict[arg[0]].getQuestName()] -
+							1]).getNPCDialogue()		
+						identifierDict[arg[3]].getItemAmount() - amount
 
-            if "$" in key:
-                arg = tempKey.split("$")[1].split(" ")
-                arg2 = tempKey.split("$")[1][tempKey.split("$")[1].index(" ") +
-                                             1:]
-                tempKey = tempKey.split("$")[0]
-                if arg[0] == "Quest" and questProgress[arg2] == 0:
-                    questHandler(arg2, "Receive")
-                elif arg[0] == "Currency":
-                    sub_stats[arg2.split(" ")[0]] += int(arg2.split(" ")[1])
-                elif arg[0] == "Item":
-                    arg2 = arg2.split(" ")
-                    identifierDict[arg2[0]] + int(arg2[1])
-                elif arg[0] == "Reputation":
-                    arg2 = arg2.split(" ")
-                    reputation[arg2[0]] += int(arg2[1])
+			if "$" in key: 
+				arg = tempKey.split("$")[1].split(" ")
+				arg2 = tempKey.split("$")[1][tempKey.split("$")[1].index(" ") +
+											 1:]
+				tempKey = tempKey.split("$")[0]
+				if arg[0] == "Quest" and questProgress[arg2] == 0:
+					questHandler(arg2, "Receive")
+				elif arg[0] == "Currency":
+					sub_stats[arg2.split(" ")[0]] += int(arg2.split(" ")[1])
+				elif arg[0] == "Item":
+					arg2 = arg2.split(" ")
+					identifierDict[arg2[0]] + int(arg2[1])
+				elif arg[0] == "Reputation":
+					arg2 = arg2.split(" ")
+					reputation[arg2[0]] += int(arg2[1])
+				elif arg[0] == "MetBefore":
+					interaction.getDialogue().setMetBefore(True)
+                    
 
-            if tempKey[tempKey.index("|") + 1] != "&":
-                val = tempKey.split("|")[1].split("&")[0]
-                val = val.split(" ")
-                val[2] = int(val[2])
-                if val[0] == "Turns":
-                    if val[1] == "<" and turns >= val[2]:
-                        continue
-                    elif val[1] == "<=" and turns > val[2]:
-                        continue
-                    elif val[1] == ">" and turns <= val[2]:
-                        continue
-                    elif val[1] == ">=" and turns < val[2]:
-                        continue
+			if tempKey[tempKey.index("|") + 1] != "&":
+				val = tempKey.split("|")[1].split("&")[0]
+				val = val.split(" ")
+				if val[0] != "Quest": #In the case that a Quest is a conditional, it does not attempt to change the quest name to an integer.
+					val[2] = int(val[2])
+				if val[0] == "Turns":
+					if val[1] == "<" and turns >= val[2]:
+						continue
+					elif val[1] == "<=" and turns > val[2]:
+						continue
+					elif val[1] == ">" and turns <= val[2]:
+						continue
+					elif val[1] == ">=" and turns < val[2]:
+						continue
+				elif val[0] == "Reputation":
+					if val[1] == "<" and turns >= val[2]:
+						continue
+					elif val[1] == "<=" and turns > val[2]:
+						continue
+					elif val[1] == ">" and turns <= val[2]:
+						continue
+					elif val[1] == ">=" and turns < val[2]:
+						continue
+				elif val[0] == "Quest":
+					if questProgress[" ".join(val[1:-1])] < int(val[-1]):
+						continue
+				elif val[0] == "nQuest": #Flipped version of Quest. Operates similarly
+					if questProgress[" ".join(val[1:-1])] > int(val[-1]):
+						continue
 
-            if len(tempKey.split("|")) > 1 and int(
-                    tempKey.split("&")[1].split("^")[0].split(" ")
-                [1]) == dialogueRound:
-                if len(tempKey.split("|")[1].split("&")[0].split(
-                        "^")) > 1 and int(
-                            tempKey.split("|")[1].split("&")[-1].split("^")
-                            [1]) != previousChoice:
-                    continue
-                print("".join(
-                    list(
-                        filter(lambda a: a not in ("@", "*", "#", "`"),
-                               blue + key.split("|")[0]))))
-                listLegals.append(key.split(")")[0])
+			if len(tempKey.split("|")) > 1 and int(
+					tempKey.split("&")[1].split("^")[0].split(" ")
+				[1]) == dialogueRound:
+				if len(tempKey.split("|")[1].split("&")[0].split(
+					"^")) > 1 and int(
+						tempKey.split("|")[1].split("&")[-1].split("^")
+						[1]) != previousChoice:
+					continue
+				print("".join(
+					list(
+						filter(lambda a: a not in ("@", "*", "#", "`"),
+							blue + key.split("|")[0]))))
+				listLegals.append(key.split(")")[0])
 
-        userInput = checkIn(listLegals, "str",
-                            (cyan + "What will you say? " + gold))
+		userInput = checkIn(listLegals, "str",
+							(cyan + "What will you say? " + gold))
 
-        for key in tempDictionary.keys():
-            if (userInput + ")") in key and key.find(userInput + ")") == 0:
-                print("".join(
-                    list(
-                        filter(lambda a: a not in ("@", "*", "#", "`"),
-                               blue + key.split(")")[1].split("|")[0]))))
-                print(reset +
-                      interaction.getDialogue().getOneFurtherDialogue(key))
+		for key in tempDictionary.keys():
+			if (userInput + ")") in key and key.find(userInput + ")") == 0:
+				print("".join(
+					list(
+						filter(lambda a: a not in ("@", "*", "#", "`"),
+							blue + key.split(")")[1].split("|")[0]))))
+				print(reset +
+					interaction.getDialogue().getOneFurtherDialogue(key))
 
-                if "@" in key:
-                    dialogueRound = 1
-                    previousChoice = ""
-                elif "*" not in key:
-                    dialogueRound += 1
-                    previousChoice = userInput
-                else:
-                    previousChoice = ""
-                break
-        if userInput == "g":
-            break
-    print(interaction.getDialogue().getGoodbye(turns))
+				if "@" in key:
+					dialogueRound = 1
+					previousChoice = ""
+				elif "*" not in key:
+					dialogueRound += 1
+					previousChoice = userInput
+				else:
+					previousChoice = ""
+				break
+		if userInput == "g":
+			break
+	print(interaction.getDialogue().getGoodbye(turns))
 
 
 def haggle(haggleType: str, merchantTargetCost: int) -> int:
@@ -1498,6 +1519,14 @@ def interactionManager(kind, accessTileID):
         return
     elif kind == "Dialogue":  #Talk to NPCs
         dialogueManager(variable)
+    elif kind == "Multi-Dialogue": #In order to fit multiple dialogue NPCs into the same tile, multiple Interactibles need to be initialized and then filled into the base Interactible object. Note: Store dialogues as {"NPC Name":Interactible}.
+        print("People in this area: ")
+        for key in variable.getDialogueLink().keys():
+            print(f"{green}{key}")
+        speakTo = checkIn(list(variable.getDialogueLink().keys()), "str", message=f"{blue}Who to talk to? {gold}")
+        print(f"{blue} You speak to {green}{speakTo}.")
+        dialogueManager(variable.getDialogueLink()[speakTo])
+        return
     elif kind == "Quest Hall":
         questHall()
 
@@ -1610,7 +1639,7 @@ def tileManager(
     fitDict = {
         key: value
         for key, value in questProgress.items()
-        if value < len(questsDict[key].getQuestChainTuple())
+        if key in questsDict and value < len(questsDict[key].getQuestChainTuple())
     }
     enterQuests = [
         questsDict[key] for key, value in fitDict.items()
@@ -1958,46 +1987,10 @@ def newGame():
         }
     }  #Stats that are dependent upon the stats read by the stats function,
 
-    questProgress = {
-        "Bandits": 0
-    }  #Dictionary for storing quest progression based on stages! Get quests from NPCs.
+    questProgress = defaultQuests #Dictionary for storing quest progression based on stages! Get quests from NPCs.
 
-    reputation = {
-        "Silvaris": 0,
-        "Eldenholm Resistance": 0,
-        "Grekkian City States": 0,
-        "Tolah Sultanate": 0,
-        "Tourial": 0,
-        "Moonreach Guild": 0,
-        "Kingdom of Wroburg": 0,
-        "House Bogyar": 0,
-        "House Valion": 0,
-        "House Ertannis": 0,
-        "House Illiani": 0,
-        "Crown Restorationists": 0,
-        "Hendron Pact": 0,
-        "Elven Kingdom": 0,
-        "Firway": 0,
-        "Trading House Hariel": 0,
-        "Great Dune Caravans": 0,
-        "House Rundal": 0,
-        "Red Banner Company": 0,
-        "Cerrunis": 0,
-        "Northern Hordes": -50,
-        "Mountain Jarldom": 0,
-        "Draconic Accord": 0,
-        "Green Consortium": 0,
-        "Light Pantheon": 0,
-        "Death Pantheon": 0,
-        "Life Pantheon": 0,
-        "Nature": 0,
-        "Mind Pantheon": 0,
-        "Stellar Covenant": 0,
-        "Irithyn Concord": 0,
-        "Yorkal Hive": 0,
-        "Sirph": 0,
-        "Mind of the Void": -1000
-    }  #Reputation system for NPC convo buffs, quests, Sparing system, etc
+    reputation = defaultRep  #Reputation system for NPC convo buffs, quests, Sparing system, etc
+	
     skillLevels = {
         "Fishing": 0,
         "Herbalism": 0,
@@ -2022,6 +2015,8 @@ def newGame():
     statusEffects = {}
 
     tileRespawn = {}  #Locally stores the respawn timers for items and mobs.
+
+    metNPCs = []
 
     killedNPCs = {}
 
@@ -2089,7 +2084,7 @@ def registerAccount():
 
 
 def __main__():
-    global name, race, gender, tile, stats, sub_stats, equipped, inventory, questProgress, tileItems, mobList, reputation, turns, statusEffects, killedNPCs, skillLevels, tileRespawn, username
+    global name, race, gender, tile, stats, sub_stats, equipped, inventory, questProgress, tileItems, mobList, reputation, turns, statusEffects, metNPCs, killedNPCs, skillLevels, tileRespawn, username
 
     n, usn = registerAccount()
     if n:
@@ -2113,12 +2108,20 @@ def __main__():
                     sub_stats["Element Defense"])
                 tileItems = dict(record["Tile Items"])
                 questProgress = dict(record["Quest Progress"])
+                for key, value in defaultQuests.items():
+                    if key not in questProgress:
+                        questProgress[key] = value
                 reputation = dict(record["Reputation"])
+                for key, value in defaultRep.items():
+                    if key not in reputation:
+                        reputation[key] = value
                 mobList = dict(record["Mob List"])
                 skillLevels = dict(record["Skill Levels"])
                 enterDict = {}
                 placeholder = record["Equipped"]
+                metNPCs = list(record["Met NPCs"])
                 killedNPCs = dict(record["Killed NPCs"])
+				
                 for key, value in placeholder.items():
                     if value != "Empty":
                         loadList = value.split("|")
