@@ -106,12 +106,14 @@ class Dialogue:
                  goodbye={},
                  metBefore=False,
                  dialogueRounds={},
-                 faction=""):
+                 faction="",
+                 npcName=""):
         self.greeting = greeting
         self.goodbye = goodbye
         self.dialogueRounds = dialogueRounds
         self.metBefore = metBefore
         self.faction = faction
+        self.npcName = npcName
 
     def getFaction(self):
         return self.faction
@@ -122,6 +124,8 @@ class Dialogue:
     def setMetBefore(self, value):
         self.metBefore = value
 
+    def getNPCName(self):
+        return self.npcName
     def getGreeting(self, turn, questDict):
         for key, value in self.greeting.items():
             key = key.split(" ")
@@ -282,7 +286,7 @@ dialogue1 = Dialogue(
         "g)Goodbye.|&Round 1": "",
         "g)Goodbye.|&Round 2": ""
     },
-    faction="Moonreach Guild")
+    faction="Moonreach Guild", npcName="Traveller Hervald")
 
 dialogue2 = Dialogue(
     greeting={
@@ -301,14 +305,16 @@ dialogue2 = Dialogue(
         "\"Haha, I'd be throwin' away my business if I told you!\"",
         "g)Goodbye.|&Round 1": ""
     },
-    faction="Moonreach Guild")
+    faction="Moonreach Guild", npcName="Peddler Jonas")
 
 dialogue3 = Dialogue(
     greeting={"Starter": "\"Is there something you need?\""},
     goodbye={"Starter": "\"My best wishes for your travels. Now, if you'll excuse me...\""},
     metBefore=False,
     dialogueRounds={"a)Ask about the current state of Moonreach and its place in the forests.@|nQuest Siege of Wroburg 1&Round 1":"\"I am sure the librarian would be happy to lecture you on our history, though right now, our Guild hasn't many issues.\nThat is, aside from the vermin that still run around rampant in our sewage.\"", "w)Ask about who he is.@|&Round 1":"\"I am Chrys Sanguinis, this Guild's master. Perhaps you may have heard of me as the Torch of Perst.\nProbably not. It was likely ahead of your time.\"", "g)Goodbye.|&Round 1":""},
-    faction="Moonreach Guild")
+    faction="Moonreach Guild", npcName="Chrys Sanguinis")
+
+
 
 merchant1 = Merchant(
     "Peddler Jonas",
@@ -1282,4 +1288,10 @@ interactionDict = {
     16: crafting1,
     21: moonreachQuestHall,
     27: interact5
+}
+
+dialogueDict = {
+	"Traveler Hervald":dialogue1,
+	"Peddler Jonas": dialogue2,
+	"Chrys Sanguinis": dialogue3
 }

@@ -1,7 +1,7 @@
 import os
 from magic import effectDict, spellDict
 import replit
-from tiles import tilesDict, interactionDict, Interactible
+from tiles import tilesDict, interactionDict, Interactible, dialogueDict
 #import saveData
 from playerInventory import identifierDict, recipeDict, Recipe
 from replit import db
@@ -1639,7 +1639,7 @@ def tileManager(
     fitDict = {
         key: value
         for key, value in questProgress.items()
-        if key in questsDict and value < len(questsDict[key].getQuestChainTuple())
+        if value < len(questsDict[key].getQuestChainTuple())
     }
     enterQuests = [
         questsDict[key] for key, value in fitDict.items()
@@ -1985,12 +1985,11 @@ def newGame():
             "Moon": 0,
             "Star": 0
         }
-    }  #Stats that are dependent upon the stats read by the stats function,
+    }  #Stats that are dependent upon the stats read by the stats function, or are those not represented entirely as stats in the in-game stats checker.
 
     questProgress = defaultQuests #Dictionary for storing quest progression based on stages! Get quests from NPCs.
 
     reputation = defaultRep  #Reputation system for NPC convo buffs, quests, Sparing system, etc
-	
     skillLevels = {
         "Fishing": 0,
         "Herbalism": 0,
@@ -2016,9 +2015,9 @@ def newGame():
 
     tileRespawn = {}  #Locally stores the respawn timers for items and mobs.
 
-    metNPCs = []
+    metNPCs = [] #Stores NPCs the player has gained a metBefore status with.
 
-    killedNPCs = {}
+    killedNPCs = {} #Stores dead NPCs.
 
     equipped = {
         "Head": "Empty",
@@ -2032,9 +2031,6 @@ def newGame():
     }  #Slots for items.
     statAssign()
     tileManager(1)
-
-
-#Start
 
 
 def registerAccount():
@@ -2083,7 +2079,7 @@ def registerAccount():
         print(e)
 
 
-def __main__():
+def __main__(): #Start Here
     global name, race, gender, tile, stats, sub_stats, equipped, inventory, questProgress, tileItems, mobList, reputation, turns, statusEffects, metNPCs, killedNPCs, skillLevels, tileRespawn, username
 
     n, usn = registerAccount()
@@ -2095,7 +2091,7 @@ def __main__():
             userInput = checkIn(
                 ("yes", "no"), "str",
                 "Would you like to load it? " + gold + "(yes/no) ")
-            if userInput == "yes":
+            if userInput == "yes": #Loads data
                 turns = record["Turns"]
                 name = record["Name"]
                 race = record["Race"]
@@ -2120,6 +2116,8 @@ def __main__():
                 enterDict = {}
                 placeholder = record["Equipped"]
                 metNPCs = list(record["Met NPCs"])
+                for i in metNPCs:
+                    dialogueDict[i].setMetBefore(True)
                 killedNPCs = dict(record["Killed NPCs"])
 				
                 for key, value in placeholder.items():
@@ -2147,25 +2145,18 @@ def __main__():
                 tileRespawn = dict(record["Tile Respawn"])
                 placeholder = {
                     key: value
-                    for key, value in defaultTileRespawns.items()
-                    if key not in tileRespawn
-                }
-                for key, value in placeholder.items():
-                    tileRespawn.update({key: value})
-                placeholder = {
-                    key: value
                     for key, value in defaultTileItems.items()
                     if key not in tileItems
                 }
                 for key, value in placeholder.items():
-                    tileItems.update({key: value})
+                    tileItems.update({key: value}) #Adds fields to tileItems if there is a new update after player has created a saved character.
                 placeholder = {
                     key: value
                     for key, value in defaultMobList.items()
-                    if key not in tileItems
+                    if key not in mobList
                 }
                 for key, value in placeholder.items():
-                    mobList.update({key: value})
+                    mobList.update({key: value}) #Adds fields to moblist if there is a new update after player has created a saved character.
                 replit.clear()
                 print(green + "Data Loaded!")
 
