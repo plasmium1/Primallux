@@ -1,6 +1,9 @@
 .breakpoints
 .replit
+.cache
+.config
 poetry.lock
 pyproject.toml
+pyproject.toml.working
 __pycache__
 venv

@@ -937,7 +937,7 @@ tile26 = Tile((
     reset +
     "An empty-ceiling room lies here, a single man dressed in loose robes standing in its center. He seems to be engrossed in a series of artful strikes against an invisible opponent."
 ), ("The room opens into the clear sky above, sunny light shining down on fluffy clouds that float through the towers of the guild hall roof."
-    ), 26, {"West": 24})  #Yin Nagata NPC, may challenge player.
+    ), 26, {"East": 24})  #Yin Nagata NPC, may challenge player.
 
 tile27 = Tile(
     (reset +
@@ -1233,6 +1233,14 @@ dungeonTile5 = Tile(
     noMoreMobsText=
     "It's a serene environment indeed, as the rhythmic plip, plop, of water droplets sounds in your ears, a rhythmic, slow, noise."
 )
+
+dungeonTile6 = Tile(
+	(reset + 
+	 "Glowing bright green fungus encircles a column of stone reaching in a tower up from the ground, flaring brightly at some moments, and darkening soon after."
+	), 
+	("The stone is damp beneath your feet, as you spot the glowing mushrooms illuminate the stone in places that make this cavern seem as if a picture from another world."
+	), 
+	-6, {"West":-4}, encounter=mobDict["Cave Shrieker"], encounterChance=9, findNoEncounterText="The gleaming of mushrooms appears to pulse every few seconds or so. Perhaps it was a trick of the light, but the fungus seems to be moving.", noMoreMobsText="What you heard at the edge of your hearing, of what was like the tapping of myriad tiny, rubbery, feet squeaking against the stone, seems to have disappeared.", entryEncounter=True)
 
 tilesDict = {
     1: tile1,

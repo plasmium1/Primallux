@@ -1049,7 +1049,7 @@ def monsterFight(mob, tile):
     fitDict = {
         key: value
         for key, value in questProgress.items()
-        if value < len(questsDict[key].getQuestChainTuple())
+        if key in questsDict and value < len(questsDict[key].getQuestChainTuple())
     }
     killQuests = [
         questsDict[key] for key, value in fitDict.items()
@@ -1639,7 +1639,7 @@ def tileManager(
     fitDict = {
         key: value
         for key, value in questProgress.items()
-        if value < len(questsDict[key].getQuestChainTuple())
+        if key in questsDict and value < len(questsDict[key].getQuestChainTuple())
     }
     enterQuests = [
         questsDict[key] for key, value in fitDict.items()
@@ -2082,7 +2082,10 @@ def registerAccount():
 def __main__(): #Start Here
     global name, race, gender, tile, stats, sub_stats, equipped, inventory, questProgress, tileItems, mobList, reputation, turns, statusEffects, metNPCs, killedNPCs, skillLevels, tileRespawn, username
 
-    n, usn = registerAccount()
+    try:
+        n, usn = registerAccount()
+    except:
+        n, usn = registerAccount()
     if n:
         global record
         record = db[usn]["Data"]
