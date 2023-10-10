@@ -279,7 +279,7 @@ dialogue1 = Dialogue(
     goodbye={"Starter": "\"I wish you luck on your journey!\""},
     metBefore=False,
     dialogueRounds={
-        "f)Ask about the fortress.|Turns < 200&Round 1":
+        "f)Ask about the fortress.|nMet 0&Round 1 $MetBefore":
         "\"The Moonreach Fortress is pretty much the center of the Hertolfan forest, the hub of trade in this region.\nThe guild pays no little amount of gold to its adventurers who go out and protect citizens like me.\nAnd, I get to be paid when they buy my goods!\"",
         "b)Ask the traveler why he didn't join the Guild.|&Round 2^f@":
         "\"Well, uh, I'm not that brave of a guy, haha.\"",
@@ -1128,10 +1128,12 @@ tile37 = Tile(
     "A small family of foxes stare at you from next to a tree trunk. While they still are wary of you, they do not flee."
 )
 
+
+
 dungeonTile1 = Tile(
     (reset +
      "The interior is cool, as your feet tap against the stone of the floor."),
-    ("Light still comes from the entrance, as greenery shows beyond the cool, dark, cave.\nYou notice that the tunnels branch into two directions."
+    ("Light still comes from the entrance, as greenery shows beyond the cool, dark, cave.\nYou notice that the tunnels branch into two directions that meet each other again."
      ),
     -1, {"East": -2},
     tileNotFoundText=(gold + "You bump into a stone wall in the darkness."),
@@ -1199,13 +1201,12 @@ dungeonTile4 = Tile(
      ),
     ("You spot that there are several stones that look climbable, near the place from whence you came."
      ),
-    -4, {"South": -5},
+    -4, {"South": -5, "East": -6},
+    tileNotFoundText=(gold + "You bump into a stone wall in the darkness."),
     climbable=True,
     upTileID=-3,
     climbText=
     "You manage to clamber you way up the stones, escaping into the darkened passage above.",
-    climbFailText=
-    "Your hands have difficulty grasping on these stones in the darkness, and you slip back down.",
     climbFailDamage=2,
     encounter=mobDict["Cave Shrieker"],
     encounterChance=10,
@@ -1226,6 +1227,7 @@ dungeonTile5 = Tile(
     ("A patch of glowing mushrooms grows by the side of a pool of water, filled by the steady drip of water dropping from the ceiling."
      ),
     -5, {"North": -4},
+    tileNotFoundText=(gold + "You bump into a stone wall in the darkness."),
     encounter=mobDict["Cave Crawler"],
     encounterChance=8,
     findNoEncounterText=
@@ -1233,14 +1235,47 @@ dungeonTile5 = Tile(
     noMoreMobsText=
     "It's a serene environment indeed, as the rhythmic plip, plop, of water droplets sounds in your ears, a rhythmic, slow, noise."
 )
-
+    
 dungeonTile6 = Tile(
 	(reset + 
 	 "Glowing bright green fungus encircles a column of stone reaching in a tower up from the ground, flaring brightly at some moments, and darkening soon after."
 	), 
 	("The stone is damp beneath your feet, as you spot the glowing mushrooms illuminate the stone in places that make this cavern seem as if a picture from another world."
 	), 
-	-6, {"West":-4}, encounter=mobDict["Cave Shrieker"], encounterChance=9, findNoEncounterText="The gleaming of mushrooms appears to pulse every few seconds or so. Perhaps it was a trick of the light, but the fungus seems to be moving.", noMoreMobsText="What you heard at the edge of your hearing, of what was like the tapping of myriad tiny, rubbery, feet squeaking against the stone, seems to have disappeared.", entryEncounter=True)
+	-6, {"East":-7, "West":-4},
+    tileNotFoundText=(gold + "You bump into a stone wall in the darkness."), 
+	encounter=mobDict["Cave Shrieker"], 
+	encounterChance=9, 
+	findNoEncounterText="The gleaming of mushrooms appears to pulse every few seconds or so. Perhaps it was a trick of the light, but the fungus seems to be moving.", 
+	noMoreMobsText="What you heard at the edge of your hearing, of what was like the tapping of myriad tiny, rubbery, feet squeaking against the stone, seems to have disappeared.", 
+	entryEncounter=True)
+
+dungeonTile7 = Tile(
+	(reset + "Here, the color of the mushrooms shows a change, one half on the west shining bright green, and the other on the east, glows with subtle, soft blues."), 
+	("Darkness covers much of this side of the cavern, the soft blue light not bright enough to shine upon everything."), 
+	-7, 
+	{"East":-8, "West":-6}, 
+	tileNotFoundText=(gold + "You bump into a stone wall in the darkness."), 
+	encounter=mobDict["Kobold Scout"], 
+	encounterChance=8, 
+	findNoEncounterText="The flash of glowing light upon a creature's scales seems to come intermittently from the gloom-embraced caves.", 
+	noMoreMobsText="Only the slow pulsing of light accompanies your breathing in this place.")
+
+dungeonTile8 = Tile(
+	(reset + "You are deep in the darkness of the cave, a place only illuminated by the rare blue growth encrusting a stone in a nook or cranny."), 
+	("Docile creatures of the undeground skitter and veer away from you, some curious, others, frightful."), 
+	-8, 
+	{"West":-7}, 
+	tileNotFoundText=(gold + "You bump into a stone wall in the darkness."), 
+	encounter=mobDict["Cave Scythian"], 
+	encounterChance=50, 
+	findNoEncounterText="You feel the cold sensation of a gaze upon you, one that seems to pierce through the darkness and sends pins crawling over your skin.", 
+	noMoreMobsText="The eerie gaze of before does not seem to be present anymore, leaving this place a tranquil land.", 
+	entryEncounter=True, 
+	lootTable={
+		"Rolls":1, 
+	})
+
 
 tilesDict = {
     1: tile1,
@@ -1284,7 +1319,10 @@ tilesDict = {
     -2: dungeonTile2,
     -3: dungeonTile3,
     -4: dungeonTile4,
-    -5: dungeonTile5
+    -5: dungeonTile5,
+	-6: dungeonTile6,
+	-7: dungeonTile7,
+	-8: dungeonTile8
 }
 
 interactionDict = {

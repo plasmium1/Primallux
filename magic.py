@@ -46,7 +46,7 @@ class StatusEffect:
     self.target = target
     self.startTime = startTime
     self.effect = effect
-    self.baseEffect = effect
+    self.baseEffect = effect.copy()
     self.scaling = scaling
     self.durationScaling = durationScaling
     self.defaultDuration = duration
@@ -74,6 +74,11 @@ class StatusEffect:
       else:
         self.effect[key] = self.baseEffect[key] - (self.scaling * (self.level-1))
     self.duration = self.defaultDuration + (self.durationScaling * (self.level-1))
+  def resetLevel(self):
+      self.level = 1
+      for key in self.effect.keys():
+          self.effect[key] = self.baseEffect[key]
+      self.duration = self.defaultDuration
   def getDuration(self):
     return self.duration
   def getTarget(self):
@@ -144,6 +149,14 @@ class Magic:
     if len(self.effects) != 0:
       for i in self.effects:
         effectDict[i].setLevel(amount)
+  def resetLevel(self):
+      self.level = 1
+      self.damage = self.defaultDamage
+      self.cooldown = self.defaultCooldown
+      self.cost = self.defaultCost
+      if len(self.effects) != 0:
+          for i in self.effects:
+            effectDict[i].resetLevel()
   def getDamage(self):
     return self.damage
   def getHealAmount(self):
@@ -161,7 +174,7 @@ class Magic:
     self.setLevel(value[1])
   
     
-bleed = StatusEffect("Bleed", 1, 8, "player", 0, effect={"HP":-1}, scaling=1, durationScaling=1)    
+bleed = StatusEffect("Bleed", 1, 8, "player", 0, effect={"HP":-3}, scaling=2, durationScaling=1)    
 deafen = StatusEffect("Deafen", 1, 6, "player", 0, effect={"Damage":-4, "Dexterity":-5}, scaling=2)
 blinded = StatusEffect("Blinded", 1, 3, "player", 0, effect={"Dexterity":-20}, scaling=5)
 foodPoisoning = StatusEffect("Food Poisoning", 1, 28, "player", 0, effect={"Dexterity":-2, "Constitution":-4, "Current HP":-20, "Max HP":-20}, scaling=2, durationScaling=1)

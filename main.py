@@ -45,7 +45,10 @@ defaultTileRespawns = {
     "Dungeon Tile 2": 200,
     "Dungeon Tile 3": 255,
     "Dungeon Tile 4": 140,
-    "Dungeon Tile 5": 450
+    "Dungeon Tile 5": 450, 
+    "Dungeon Tile 6": 450,
+    "Dungeon Tile 7": 400,
+    "Dungeon Tile 8": 480
 }
 #Default Tile Respawn timers so I can reset the respawns once they've respawned already
 
@@ -64,7 +67,10 @@ defaultMobList = {
     "Dungeon Tile 2": 3,
     "Dungeon Tile 3": 2,
     "Dungeon Tile 4": 3,
-    "Dungeon Tile 5": 3
+    "Dungeon Tile 5": 3,
+    "Dungeon Tile 6": 3,
+    "Dungeon Tile 7": 2,
+    "Dungeon Tile 8": 1
 }  #Assigns a limit on the amount of monsters in a specific tile.
 
 
@@ -726,17 +732,13 @@ def applyEffect(
         for key, value in effect.getEffect().items():
             if key in stats:
                 stats[key] += value
-            elif key == "HP":
-                sub_stats["Current HP"] += value
-                print(red + "You take an additional " + value +
-                      " HP worth of damage.")
             elif key == "Damage":
                 sub_stats["Damage-Upper"] += value
                 sub_stats["Damage-Lower"] += value
             elif key in sub_stats:
                 sub_stats[key] += value
         statusEffects.update({str(effect): effect.getDuration() + turns})
-        return
+        return 
 
 
 def magicCasting(
@@ -784,6 +786,8 @@ def magicCasting(
                 if str(effectDict[i]) not in statusEffects:
                     effectDict[i].setTarget("player")
                     applyEffect(effectDict[i], mob)
+    #Reset the spell level in order to ensure that when cast again, the next effects aren't added to the stuff from before.
+    spell.resetLevel()
     return
 
 
@@ -880,11 +884,45 @@ def manaRegen():
 
 def monsterFight(mob, tile):
     global turns
+    global statusEffects
     turns += 1
     defendBool = False
     print(red + "----------< ! FIGHT ! >----------")
     print(reset + mob.getEnterText())
     while True:
+        if len(statusEffects) != 0: #For removing status effects when they expire.
+            tempDict = {key: value for key, value in statusEffects.items()}
+            for key, value in statusEffects.items():
+                if "HP" in key:
+                    DOTdamage = key.split("HP ")[1].split(" ")[0]
+                    sub_stats["Current HP"] += int(DOTdamage)
+                    print("You take an additional " + str(DOTdamage) + " HP worth of damage.")
+                if value - turns == 0:
+                    print(gold + "[!] " + blue + key + "effect has expired." +
+                          gold + " [!]")
+                    for key2, value2 in effectDict[key.split(" ")
+                                                   [0]].getEffect().items():
+                        if key2 in stats:
+                            stats[key2] -= value2
+                        elif key2 in sub_stats and not key2 == "Damage":
+                            sub_stats[key2] -= value2
+                        elif key2 == "Damage":
+                            sub_stats["Damage-Lower"] -= value2
+                            sub_stats["Damage-Upper"] -= value2
+                    tempDict.pop(key)
+    
+                    sub_stats["Crit Chance"] = round(
+                        (0.05 * stats["Dexterity"] *
+                         (stats["Perception"]) * 0.01) + 1, 2)
+                    sub_stats["Learn Chance"] = round(
+                        (stats["Intelligence"] * 0.1) *
+                        (stats["Wisdom"] * 0.01) + 1, 2)
+                else:
+                    print(statusEffects)
+                    print(blue + key + "lasts for " + str(value - turns) +
+                          " more turn(s).")
+            statusEffects = tempDict
+        
         manaRegen()
         print(reset + mob.getDuringText())
         print(green + "Valid Inputs:" + "\n")
@@ -997,7 +1035,7 @@ def monsterFight(mob, tile):
             mob.resetHP()
             levelUp()
             break
-
+        
         enemyMove(mob, defendBool)
         defendBool = False
         if sub_stats["Current HP"] <= 0:
@@ -1009,38 +1047,6 @@ def monsterFight(mob, tile):
             mob.resetHP()
             break
         turns += 1
-        if len(statusEffects) != 0:
-            for key, value in statusEffects.items():
-                if value == turns:
-                    print(gold + "[!] " + blue + key + "effect has expired." +
-                          gold + " [!]")
-                    key = key.split(" ")[0]
-                    for key2, value2 in effectDict[key].getEffect().items():
-                        if key2 in stats:
-                            stats[key2] -= value2
-                        elif key2 in sub_stats and not key2 == "Damage":
-                            sub_stats[key2] -= value2
-                        elif key2 == "Damage":
-                            sub_stats["Damage-Lower"] -= value2
-                            sub_stats["Damage-Upper"] -= value2
-
-                    sub_stats["Crit Chance"] = round(
-                        (0.05 * stats["Dexterity"] *
-                         (stats["Perception"]) * 0.01) + 1, 2)
-                    sub_stats["Max MP"] = stats["Wisdom"] * 5
-                    sub_stats["Current MP"] = sub_stats["Max MP"]
-                    sub_stats["Max HP"] = stats["Constitution"] * 10
-                    sub_stats["Current HP"] = sub_stats["Max HP"]
-                    sub_stats["Damage-Lower"] = stats["Strength"]
-                    sub_stats["Damage-Upper"] = stats["Strength"] + sub_stats[
-                        "Item Damage"]
-                    sub_stats["Learn Chance"] = round(
-                        (stats["Intelligence"] * 0.1) *
-                        (stats["Wisdom"] * 0.01) + 1, 2)
-                    del statusEffects[key]
-                else:
-                    print(blue + key + "lasts for " + str(value - turns) +
-                          " more turn(s).")
 
     mob.resetDamage()
     mob.resetDefense()
@@ -1065,6 +1071,7 @@ def monsterFight(mob, tile):
 
 def dialogueManager(interaction: Interactible):
 	print(interaction.getDialogue().getGreeting(turns, questProgress))
+	dlog = interaction.getDialogue()
 	dialogueRound = 1
 	previousChoice = ""
 	tempDictionary = interaction.getDialogue().getFurtherDialogueDict()
@@ -1148,6 +1155,9 @@ def dialogueManager(interaction: Interactible):
 						continue
 				elif val[0] == "nQuest": #Flipped version of Quest. Operates similarly
 					if questProgress[" ".join(val[1:-1])] > int(val[-1]):
+						continue
+				elif val[0] == "nMet":
+					if not dlog.getMetBefore():
 						continue
 
 			if len(tempKey.split("|")) > 1 and int(
@@ -1601,7 +1611,7 @@ def tileManager(
             questProgress
     ):  #Test if there is a quest encounter at this tile and quest stage. If there is, it will proceed by playing out the encounter.
         monster, val = variable.getQuestEncounter(questProgress)
-        if type(monster) == list or type(monster) == tuple:
+        if type(monster) == list or type(monster) == tuple: #Randomly select a monster from the questEncounters list at that quest stage.
             monster = choice(monster)
         monsterFight(monster, number)
         variable.questEncounterWin(val)
@@ -2070,11 +2080,11 @@ def registerAccount():
                 else:
                     replit.clear()
                     print(red + "Password and Username do not match.")
-                    registerAccount()
+                    return registerAccount()
             except KeyError:
                 replit.clear()
                 print(red + "This account is not registered.")
-                registerAccount()
+                return registerAccount()
     except AttributeError as e:
         print(e)
 
@@ -2082,10 +2092,7 @@ def registerAccount():
 def __main__(): #Start Here
     global name, race, gender, tile, stats, sub_stats, equipped, inventory, questProgress, tileItems, mobList, reputation, turns, statusEffects, metNPCs, killedNPCs, skillLevels, tileRespawn, username
 
-    try:
-        n, usn = registerAccount()
-    except:
-        n, usn = registerAccount()
+    n, usn = registerAccount()
     if n:
         global record
         record = db[usn]["Data"]

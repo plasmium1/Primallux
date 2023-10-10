@@ -2,8 +2,10 @@
 .replit
 .cache
 .config
+replit.nix
 poetry.lock
 pyproject.toml
 pyproject.toml.working
 __pycache__
+__replit_disck_meta.json
 venv
