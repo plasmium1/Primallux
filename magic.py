@@ -89,7 +89,7 @@ class StatusEffect:
     return self.startTime
   def getScaling(self):
     return self.scaling
-  def getEffect(self):
+  def getEffect(self, lv=1):
     return self.effect
   
 

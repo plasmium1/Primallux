@@ -39,6 +39,7 @@ defaultTileRespawns = {
     "Tile 1": 240,
     "Tile 3": 210,
     "Tile 9": 210,
+	"Tile 31": 210,
     "Tile 32": 300,
     "Tile 36": 210,
     "Dungeon Tile 1": 205,
@@ -62,6 +63,7 @@ defaultTileItems = {
 
 defaultMobList = {
     "Tile 9": 6,
+	"Tile 31": 3,
     "Tile 32": 4,
     "Dungeon Tile 1": 4,
     "Dungeon Tile 2": 3,
@@ -161,6 +163,9 @@ def save(): #Saves the user into their DB.
         enterDict.update({string: value})
     record["Status Effects"] = enterDict
     username = input(reset + "Enter your account username: " + gold)
+    if username not in db.keys():
+        print(red + "That username doesn't exist!")
+        return
     pwd = input(reset + "Enter your account password: " + gold)
     if db[username]["PWD"] != pwd:
         print(red + "Password and username do not match.")
@@ -494,6 +499,7 @@ def consumableMenu():
             return
         for i in legalList:
             print(blue + "[ " + str(i) + blue + " ]", reset)
+        consumableMenu()
     elif consumableChecker == "exit":
         return
     else:
@@ -501,6 +507,8 @@ def consumableMenu():
         if IDDict[consumableChecker].getItemAmount() > 0:
             for key, value in IDDict[consumableChecker].getBonusDict().items():
                 try:
+                    if key == "Current HP":
+                        print(green + "Healed " + str(value) + " HP.", reset)
                     sub_stats[key] += value
                 except:
                     stats[key] += value
@@ -900,8 +908,12 @@ def monsterFight(mob, tile):
                 if value - turns == 0:
                     print(gold + "[!] " + blue + key + "effect has expired." +
                           gold + " [!]")
-                    for key2, value2 in effectDict[key.split(" ")
-                                                   [0]].getEffect().items():
+					val = key.split(":")[0].split(" ")[:-1] #Retrieve the correct effectDict reference name
+                    effectKey = ""
+                    for i in val:
+                        effectKey += i + " "
+                    effectKey = effectKey[:-1]
+                    for key2, value2 in effectDict[effectKey].getEffect().items():
                         if key2 in stats:
                             stats[key2] -= value2
                         elif key2 in sub_stats and not key2 == "Damage":
@@ -1378,7 +1390,7 @@ def questHall():
     QHNames = {21: "Moonreach Quest Hall"}
     print(orange + " -----{ " + QHNames[tile] + " }----- ")
     action = checkIn(("take", "complete", "exit"), "str", (
-        f"{blue} {underline}Take {reset} {blue}a quest, {underline}Complete {reset} {blue} a quest, or exit."
+        f"{blue} {underline}Take{reset} {blue}a quest, {underline}Complete{reset} {blue}a quest, or exit."
     ))
 
     questHallDict = {21: moonreachQuests}
@@ -1582,8 +1594,12 @@ def tileManager(
             if value - turns == 0:
                 print(gold + "[!] " + blue + key + "effect has expired." +
                       gold + " [!]")
-                for key2, value2 in effectDict[key.split(" ")
-                                               [0]].getEffect().items():
+                val = key.split(":")[0].split(" ")[:-1] #Retrieve the correct effectDict reference name
+                effectKey = ""
+                for i in val:
+                    effectKey += i + " "
+                effectKey = effectKey[:-1]
+                for key2, value2 in effectDict[effectKey].getEffect().items():
                     if key2 in stats:
                         stats[key2] -= value2
                     elif key2 in sub_stats and not key2 == "Damage":

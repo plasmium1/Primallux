@@ -1027,7 +1027,7 @@ tile32 = Tile((
               32, {
                   "North": 31,
                   "West": 33
-              },
+              }, encounter=mobDict["Forest Wolf"], encounterChance=16,
               lootTable={
                   "Rolls": 1,
                   "Northern Fern Spore-Sac": 25,
