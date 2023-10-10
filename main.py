@@ -50,7 +50,7 @@ defaultTileRespawns = {
     "Dungeon Tile 7": 400,
     "Dungeon Tile 8": 480
 }
-#Default Tile Respawn timers so I can reset the respawns once they've respawned already
+#Default Tile Respawn timers so the code can reset the respawns once they've respawned already
 
 defaultTileItems = {
     "Tile 1": 4,
@@ -79,7 +79,7 @@ IDDict = identifierDict
 #Stores IDs for items, keyed to their names
 
 
-def roman_to_int(string):
+def roman_to_int(string): #Converts roman numerals to Python integers
     roman = {
         'I': 1,
         'V': 5,
@@ -107,7 +107,7 @@ def roman_to_int(string):
     return num
 
 
-def properTitle(inp):
+def properTitle(inp): #Capitalizes objects with titles following proper Engish titling format
     inp = inp.split(" ")
     inp[0] = inp[0].capitalize()
     inp[-1] = inp[-1].capitalize()
@@ -124,7 +124,7 @@ def properTitle(inp):
     return ret
 
 
-def save():
+def save(): #Saves the user into their DB.
     global username
     record = {}
     record["Turns"] = turns
@@ -387,7 +387,7 @@ def checkIn(
     return inputVal
 
 
-def showTilePossibleInputs(tileID):
+def showTilePossibleInputs(tileID): #Displays the possible inputs in tiles.
     thisTile = tilesDict[tileID]
     print(green + "Valid inputs: ")
     possibleInputs = "help, look, inventory, stats, skills, quests, wander, "
@@ -437,7 +437,7 @@ def statsCheck():  #In-game stat checker!
               str(sub_stats["Element Defense"][key]))
 
 
-def skillsCheck():
+def skillsCheck(): #Shows the user's skill levels.
     print(green + "-----{" + name + "'s Skills}-----")
     for key, value in skillLevels.items():
         if value > 0:
@@ -728,7 +728,7 @@ def applyEffect(
             elif effect.getEffect() == "Intelligence":
                 mob.removeSpell()
     elif effect.getTarget() == "player":
-        print(gold + "[!]" + orange + " Received effect " + str(effect), reset)
+        print(gold + "[!]" + orange + " Received effect " + str(effect) + gold + "[!]", reset)
         for key, value in effect.getEffect().items():
             if key in stats:
                 stats[key] += value
@@ -918,7 +918,6 @@ def monsterFight(mob, tile):
                         (stats["Intelligence"] * 0.1) *
                         (stats["Wisdom"] * 0.01) + 1, 2)
                 else:
-                    print(statusEffects)
                     print(blue + key + "lasts for " + str(value - turns) +
                           " more turn(s).")
             statusEffects = tempDict
@@ -1070,7 +1069,11 @@ def monsterFight(mob, tile):
 
 
 def dialogueManager(interaction: Interactible):
-	print(interaction.getDialogue().getGreeting(turns, questProgress))
+	try:
+		print(interaction.getDialogue().getGreeting(turns, questProgress))
+	except:
+		print("This person does not appear like they wish to speak at the moment.") 
+		return
 	dlog = interaction.getDialogue()
 	dialogueRound = 1
 	previousChoice = ""
@@ -1514,7 +1517,7 @@ def interactionManager(kind, accessTileID):
         if len(resourceList) == 0:
             print(
                 blue +
-                "You fail to manage to extract any resources from this area.")
+                "You fail to extract any resources from this area.")
         else:
             for i in resourceList:
                 lis = i.split("|")
@@ -1933,7 +1936,7 @@ def questHandler(quest: Quest, action: str, inp="", tileNum=0):
 
 
 def newGame():
-    global name, race, gender, tile, stats, sub_stats, equipped, inventory, questProgress, tileItems, mobList, reputation, turns, statusEffects, killedNPCs, tileRespawn, skillLevels
+    global name, race, gender, tile, stats, sub_stats, equipped, inventory, questProgress, tileItems, mobList, reputation, turns, statusEffects, metNPCs, killedNPCs, tileRespawn, skillLevels
     tile = 1
     name = ""
     race = ""
