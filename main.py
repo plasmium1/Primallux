@@ -908,12 +908,16 @@ def monsterFight(mob, tile):
                 if value - turns == 0:
                     print(gold + "[!] " + blue + key + "effect has expired." +
                           gold + " [!]")
-					val = key.split(":")[0].split(" ")[:-1] #Retrieve the correct effectDict reference name
+                    val = key.split(":")[0].split(" ")[:-1] #Retrieve the correct effectDict reference name.
+                    effLevel = roman_to_int(key.split(":")[0].split(" ")[-1])
                     effectKey = ""
                     for i in val:
                         effectKey += i + " "
                     effectKey = effectKey[:-1]
+                    effectDict[effectKey].setLevel(effLevel)
+
                     for key2, value2 in effectDict[effectKey].getEffect().items():
+                        
                         if key2 in stats:
                             stats[key2] -= value2
                         elif key2 in sub_stats and not key2 == "Damage":
@@ -929,6 +933,7 @@ def monsterFight(mob, tile):
                     sub_stats["Learn Chance"] = round(
                         (stats["Intelligence"] * 0.1) *
                         (stats["Wisdom"] * 0.01) + 1, 2)
+                    effectDict[effectKey].resetLevel()
                 else:
                     print(blue + key + "lasts for " + str(value - turns) +
                           " more turn(s).")
@@ -1594,12 +1599,16 @@ def tileManager(
             if value - turns == 0:
                 print(gold + "[!] " + blue + key + "effect has expired." +
                       gold + " [!]")
-                val = key.split(":")[0].split(" ")[:-1] #Retrieve the correct effectDict reference name
+                val = key.split(":")[0].split(" ")[:-1] #Retrieve the correct effectDict reference name.
+                effLevel = roman_to_int(key.split(":")[0].split(" ")[-1])
                 effectKey = ""
                 for i in val:
                     effectKey += i + " "
                 effectKey = effectKey[:-1]
+                effectDict[effectKey].setLevel(effLevel)
+
                 for key2, value2 in effectDict[effectKey].getEffect().items():
+                    
                     if key2 in stats:
                         stats[key2] -= value2
                     elif key2 in sub_stats and not key2 == "Damage":
@@ -1608,6 +1617,14 @@ def tileManager(
                         sub_stats["Damage-Lower"] -= value2
                         sub_stats["Damage-Upper"] -= value2
                 tempDict.pop(key)
+
+                sub_stats["Crit Chance"] = round(
+                    (0.05 * stats["Dexterity"] *
+                     (stats["Perception"]) * 0.01) + 1, 2)
+                sub_stats["Learn Chance"] = round(
+                    (stats["Intelligence"] * 0.1) *
+                    (stats["Wisdom"] * 0.01) + 1, 2)
+                effectDict[effectKey].resetLevel()
             else:
                 print(blue + key + "lasts for " + str(value - turns) +
                       " more turn(s).")

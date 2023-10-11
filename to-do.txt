@@ -12,6 +12,8 @@ Implement magic casting (Done for mobs, not done for players)
 
 Fix the bug of status effects having their levels reset when loading back in. (FINISHED)
 
+Fix the bug where non-level 1 effects aren't fully cleared after expiration.
+
 Make resource tiles work, and test it out - (FINISHED)
 
 Work out nighttime at specific turn intervals. I'm thinking of making it every 250? 500? turns.
@@ -63,6 +65,8 @@ Quest hall interactible!!! (Added, tested for single quest, untested for random 
 Library interactible for managing buying into skill levels and handling item enchantment.
 
 Mob defence move for more complex fights.
+
+Mob magic charge up turns for more powerful moves?
 
 Make a login thing since REPL_OWNER doesn't work in forcing .
 

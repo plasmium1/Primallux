@@ -1,5 +1,8 @@
 Package Docs.
 
+I have coded a lot of features into the main.py file so that I can easily expand and update the game only by adding new objects for everything that doesn't change fundamental mechanics. Examples include Tiles (areas), Monsters, Items, Consumables, Interactions, Magic, Status Effects, Merchants, Crafting Recipes, and more.
+
+
 Dialogue system <- Finished!
  - This uses various different characters in its key string to specify conditions that need to be met for a specific response.
  -- The (insertSomeLetter) character, followed by a closing parenthesis, specifies what character needs to be inputted to choose that response. Ex: a), b), abc)

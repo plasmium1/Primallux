@@ -81,7 +81,6 @@ We have:
 - Faction disputes! In specific global times, a global event will come that likely changes many things in various encounters while the game goes on!
 - Arena system with PVP!
 
-
 -------------------------
 | Developer Credits: |
 -------------------------
